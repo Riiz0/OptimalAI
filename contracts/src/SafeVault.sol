@@ -7,7 +7,7 @@ import {ProtocolHelper} from "./ProtocolHelper.sol";
 
 /**
  * @title SafeVault
- * @author Optimal-AI
+ * @author OptimalAI
  * @notice This is a vault contract for a single user address used to track investments and implement strategies.
  * @notice This contract inherits OptimalAI's ProtocolHelper contract to interact with various DEFI protocols.
  * @notice It allows users to deposit and withdraw ERC20 tokens into their vault.

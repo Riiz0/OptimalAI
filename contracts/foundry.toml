@@ -21,7 +21,7 @@ fuzz_runs = 1000
 [profile.ci]
 verbosity = 4
 
-gas_reports = ["cento"]
+gas_reports = ["optimal"]
 
 
 [etherscan]
