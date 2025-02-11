@@ -36,32 +36,12 @@ abstract contract CometMainInterface {
     event Transfer(address indexed from, address indexed to, uint256 amount);
     event Withdraw(address indexed src, address indexed to, uint256 amount);
 
-    event SupplyCollateral(
-        address indexed from,
-        address indexed dst,
-        address indexed asset,
-        uint256 amount
-    );
-    event TransferCollateral(
-        address indexed from,
-        address indexed to,
-        address indexed asset,
-        uint256 amount
-    );
-    event WithdrawCollateral(
-        address indexed src,
-        address indexed to,
-        address indexed asset,
-        uint256 amount
-    );
+    event SupplyCollateral(address indexed from, address indexed dst, address indexed asset, uint256 amount);
+    event TransferCollateral(address indexed from, address indexed to, address indexed asset, uint256 amount);
+    event WithdrawCollateral(address indexed src, address indexed to, address indexed asset, uint256 amount);
 
     /// @notice Event emitted when a borrow position is absorbed by the protocol
-    event AbsorbDebt(
-        address indexed absorber,
-        address indexed borrower,
-        uint256 basePaidOut,
-        uint256 usdValue
-    );
+    event AbsorbDebt(address indexed absorber, address indexed borrower, uint256 basePaidOut, uint256 usdValue);
 
     /// @notice Event emitted when a user's collateral is absorbed by the protocol
     event AbsorbCollateral(
@@ -73,103 +53,43 @@ abstract contract CometMainInterface {
     );
 
     /// @notice Event emitted when a collateral asset is purchased from the protocol
-    event BuyCollateral(
-        address indexed buyer,
-        address indexed asset,
-        uint256 baseAmount,
-        uint256 collateralAmount
-    );
+    event BuyCollateral(address indexed buyer, address indexed asset, uint256 baseAmount, uint256 collateralAmount);
 
     /// @notice Event emitted when an action is paused/unpaused
-    event PauseAction(
-        bool supplyPaused,
-        bool transferPaused,
-        bool withdrawPaused,
-        bool absorbPaused,
-        bool buyPaused
-    );
+    event PauseAction(bool supplyPaused, bool transferPaused, bool withdrawPaused, bool absorbPaused, bool buyPaused);
 
     /// @notice Event emitted when reserves are withdrawn by the governor
     event WithdrawReserves(address indexed to, uint256 amount);
 
     function supply(address asset, uint256 amount) external virtual;
 
-    function supplyTo(
-        address dst,
-        address asset,
-        uint256 amount
-    ) external virtual;
+    function supplyTo(address dst, address asset, uint256 amount) external virtual;
 
-    function supplyFrom(
-        address from,
-        address dst,
-        address asset,
-        uint256 amount
-    ) external virtual;
+    function supplyFrom(address from, address dst, address asset, uint256 amount) external virtual;
 
-    function transfer(
-        address dst,
-        uint256 amount
-    ) external virtual returns (bool);
+    function transfer(address dst, uint256 amount) external virtual returns (bool);
 
-    function transferFrom(
-        address src,
-        address dst,
-        uint256 amount
-    ) external virtual returns (bool);
+    function transferFrom(address src, address dst, uint256 amount) external virtual returns (bool);
 
-    function transferAsset(
-        address dst,
-        address asset,
-        uint256 amount
-    ) external virtual;
+    function transferAsset(address dst, address asset, uint256 amount) external virtual;
 
-    function transferAssetFrom(
-        address src,
-        address dst,
-        address asset,
-        uint256 amount
-    ) external virtual;
+    function transferAssetFrom(address src, address dst, address asset, uint256 amount) external virtual;
 
     function withdraw(address asset, uint256 amount) external virtual;
 
-    function withdrawTo(
-        address to,
-        address asset,
-        uint256 amount
-    ) external virtual;
+    function withdrawTo(address to, address asset, uint256 amount) external virtual;
 
-    function withdrawFrom(
-        address src,
-        address to,
-        address asset,
-        uint256 amount
-    ) external virtual;
+    function withdrawFrom(address src, address to, address asset, uint256 amount) external virtual;
 
-    function approveThis(
-        address manager,
-        address asset,
-        uint256 amount
-    ) external virtual;
+    function approveThis(address manager, address asset, uint256 amount) external virtual;
 
     function withdrawReserves(address to, uint256 amount) external virtual;
 
-    function absorb(
-        address absorber,
-        address[] calldata accounts
-    ) external virtual;
+    function absorb(address absorber, address[] calldata accounts) external virtual;
 
-    function buyCollateral(
-        address asset,
-        uint256 minAmount,
-        uint256 baseAmount,
-        address recipient
-    ) external virtual;
+    function buyCollateral(address asset, uint256 minAmount, uint256 baseAmount, address recipient) external virtual;
 
-    function quoteCollateral(
-        address asset,
-        uint256 baseAmount
-    ) public view virtual returns (uint256);
+    function quoteCollateral(address asset, uint256 baseAmount) public view virtual returns (uint256);
 
     // function getAssetInfo(
     //     uint8 i
@@ -179,17 +99,13 @@ abstract contract CometMainInterface {
     //     address asset
     // ) public view virtual returns (AssetInfo memory);
 
-    function getCollateralReserves(
-        address asset
-    ) public view virtual returns (uint256);
+    function getCollateralReserves(address asset) public view virtual returns (uint256);
 
     function getReserves() public view virtual returns (int256);
 
     function getPrice(address priceFeed) public view virtual returns (uint256);
 
-    function isBorrowCollateralized(
-        address account
-    ) public view virtual returns (bool);
+    function isBorrowCollateralized(address account) public view virtual returns (bool);
 
     function isLiquidatable(address account) public view virtual returns (bool);
 
@@ -199,17 +115,11 @@ abstract contract CometMainInterface {
 
     function balanceOf(address owner) public view virtual returns (uint256);
 
-    function borrowBalanceOf(
-        address account
-    ) public view virtual returns (uint256);
+    function borrowBalanceOf(address account) public view virtual returns (uint256);
 
-    function pause(
-        bool supplyPaused,
-        bool transferPaused,
-        bool withdrawPaused,
-        bool absorbPaused,
-        bool buyPaused
-    ) external virtual;
+    function pause(bool supplyPaused, bool transferPaused, bool withdrawPaused, bool absorbPaused, bool buyPaused)
+        external
+        virtual;
 
     function isSupplyPaused() public view virtual returns (bool);
 
@@ -223,13 +133,9 @@ abstract contract CometMainInterface {
 
     function accrueAccount(address account) external virtual;
 
-    function getSupplyRate(
-        uint256 utilization
-    ) public view virtual returns (uint64);
+    function getSupplyRate(uint256 utilization) public view virtual returns (uint64);
 
-    function getBorrowRate(
-        uint256 utilization
-    ) public view virtual returns (uint64);
+    function getBorrowRate(uint256 utilization) public view virtual returns (uint64);
 
     function getUtilization() public view virtual returns (uint256);
 
@@ -247,49 +153,25 @@ abstract contract CometMainInterface {
     function supplyKink() external view virtual returns (uint256);
 
     /// @dev uint64
-    function supplyPerSecondInterestRateSlopeLow()
-        external
-        view
-        virtual
-        returns (uint256);
+    function supplyPerSecondInterestRateSlopeLow() external view virtual returns (uint256);
 
     /// @dev uint64
-    function supplyPerSecondInterestRateSlopeHigh()
-        external
-        view
-        virtual
-        returns (uint256);
+    function supplyPerSecondInterestRateSlopeHigh() external view virtual returns (uint256);
 
     /// @dev uint64
-    function supplyPerSecondInterestRateBase()
-        external
-        view
-        virtual
-        returns (uint256);
+    function supplyPerSecondInterestRateBase() external view virtual returns (uint256);
 
     /// @dev uint64
     function borrowKink() external view virtual returns (uint256);
 
     /// @dev uint64
-    function borrowPerSecondInterestRateSlopeLow()
-        external
-        view
-        virtual
-        returns (uint256);
+    function borrowPerSecondInterestRateSlopeLow() external view virtual returns (uint256);
 
     /// @dev uint64
-    function borrowPerSecondInterestRateSlopeHigh()
-        external
-        view
-        virtual
-        returns (uint256);
+    function borrowPerSecondInterestRateSlopeHigh() external view virtual returns (uint256);
 
     /// @dev uint64
-    function borrowPerSecondInterestRateBase()
-        external
-        view
-        virtual
-        returns (uint256);
+    function borrowPerSecondInterestRateBase() external view virtual returns (uint256);
 
     /// @dev uint64
     function storeFrontPriceFactor() external view virtual returns (uint256);

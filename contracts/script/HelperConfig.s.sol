@@ -43,11 +43,7 @@ contract HelperConfig is Script {
         return BaseSepoliaConfig;
     }
 
-    function getArbitrumSepoliaConfig()
-        public
-        pure
-        returns (NetworkConfig memory)
-    {
+    function getArbitrumSepoliaConfig() public pure returns (NetworkConfig memory) {
         NetworkConfig memory ArbitrumSepoliaConfig = NetworkConfig({
             weth: 0x1dF462e2712496373A347f8ad10802a5E95f053D,
             usdc: 0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d,
