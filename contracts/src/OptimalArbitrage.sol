@@ -13,7 +13,7 @@ import {ISwapRouter} from "@uniswap/v3-periphery/contracts/interfaces/ISwapRoute
  * @dev The contract borrows a flash loan, performs two sequential swaps (e.g., DEX A → DEX B), repays the loan, and transfers profits to the contract owner.
  * @dev Important: The current implementation does not account for Balancer's flash loan fees, which could impact profitability.
  */
-contract CrossDexArbitrage is IFlashLoanRecipient {
+contract OptimalArbitrage is IFlashLoanRecipient {
     /// @notice Address of the Balancer V2 Vault on Base Sepolia
     IVault private constant balancerVault = IVault(0xBA12222222228d8Ba445958a75a0704d566BF2C8);
 
