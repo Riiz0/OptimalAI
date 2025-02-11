@@ -23,6 +23,9 @@
   "license": "ISC",
   "packageManager": "pnpm@10.3.0",
   "dependencies": {
+    "@elizaos/core": "0.25.6-alpha.1",
+    "@goat-sdk/core": "^0.4.7",
+    "@goat-sdk/wallet-viem": "^0.2.8",
     "dotenv": "^16.3.1",
     "express": "^4.21.2",
     "radash": "^12.1.0",
@@ -30,7 +33,6 @@
     "swagger-ui-express": "^5.0.1",
     "viem": "^2.22.21",
     "zod": "^3.24.1"
-
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
