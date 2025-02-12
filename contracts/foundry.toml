@@ -14,6 +14,9 @@ remappings = [
     "@uniswap/v3-core/contracts/=lib/v3-core/contracts/",
     "@aave/v3-core/contracts=lib/aave-v3-core/contracts",
     "@compound/contracts=lib/comet/contracts",
+    "@interop-lib/=lib/interop-lib/src/",
+    "@ethereum-optimism/optimism/packages/contracts-bedrock=lib/optimism/packages/contracts-bedrock",
+    "@solady/=lib/solady/src/"
 ]
 
 fuzz_runs = 1000
@@ -26,3 +29,7 @@ gas_reports = ["optimal"]
 
 [etherscan]
 84532 = { key = "${API_KEY}", url = "https://api-sepolia.basescan.org/api" }
+
+[rpc_endpoints]
+base-sepolia = "${BASE_SEPOLIA_RPC_URL_2}"
+op-sepolia = "${OP_SEPOLIA_RPC_URL}"
