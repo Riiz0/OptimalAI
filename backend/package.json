@@ -1,48 +1,50 @@
 {
-  "name": "backend",
-  "author": "",
-  "version": "0.0.1",
-  "description": "",
-  "engines": {
-    "node": "23.3.0"
-  },
-  "main": "dist/index.js",
+  "name": "@elizaos/eliza-starter",
+  "version": "0.1.9",
+  "main": "src/index.ts",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "typecheck": "tsc --noEmit"
+    "build": "tsup src/index.ts --format esm --dts",
+    "start": "tsc && node --loader ts-node/esm src/index.ts",
+    "clean": "./scripts/clean.sh",
+    "start:service:all": "pm2 start pnpm --name=\"all\" --restart-delay=3000 --max-restarts=10 -- run start:all",
+    "stop:service:all": "pm2 stop all"
   },
-  "packageManager": "pnpm@10.3.0",
   "dependencies": {
-    "@elizaos/adapter-postgres": "0.25.6-alpha.1",
-    "@elizaos/adapter-sqlite": "0.25.6-alpha.1",
-    "@elizaos/adapter-supabase": "0.25.6-alpha.1",
-    "@elizaos/client-auto": "0.25.6-alpha.1",
-    "@elizaos/client-direct": "0.25.6-alpha.1",
-    "@elizaos/core": "0.25.6-alpha.1",
-    "@elizaos/plugin-avalanche": "0.25.6-alpha.1",
-    "@elizaos/plugin-bootstrap": "0.25.6-alpha.1",
-    "@elizaos/plugin-coingecko": "0.25.6-alpha.1",
-    "@elizaos/plugin-coinmarketcap": "0.25.6-alpha.1",
-    "@elizaos/plugin-echochambers": "0.25.6-alpha.1",
-    "@elizaos/plugin-evm": "0.25.6-alpha.1",
-    "@elizaos/plugin-goat": "0.25.6-alpha.1",
-    "@elizaos/plugin-node": "0.25.6-alpha.1",
-    "better-sqlite3": "^11.8.1",
+    "@elizaos/adapter-postgres": "0.1.9",
+    "@elizaos/adapter-sqlite": "0.1.9",
+    "@elizaos/client-auto": "0.1.9",
+    "@elizaos/client-direct": "0.1.9",
+    "@elizaos/client-discord": "0.1.9",
+    "@elizaos/client-telegram": "0.1.9",
+    "@elizaos/client-twitter": "0.1.9",
+    "@elizaos/core": "0.1.9",
+    "@elizaos/plugin-bootstrap": "0.1.9",
+    "@elizaos/plugin-image-generation": "0.1.9",
+    "@elizaos/plugin-node": "0.1.9",
+    "@tavily/core": "0.0.2",
+    "amqplib": "0.10.5",
+    "better-sqlite3": "11.5.0",
+    "fs": "0.0.1-security",
+    "net": "1.0.2",
+    "path": "0.12.7",
     "readline": "1.3.0",
-    "sqlite-vec": "0.1.7-alpha.2",
-    "viem": "^2.23.2",
+    "url": "0.11.4",
     "ws": "8.18.0",
-    "yargs": "17.7.2",
-    "zod": "^3.24.2"
+    "yargs": "17.7.2"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "pnpm": {
+    "overrides": {
+      "onnxruntime-node": "1.20.0"
+    }
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.12",
-    "@types/node": "^20.11.24",
-    "dotenv": "^16.4.7",
-    "tsx": "^4.7.1",
-    "typescript": "^5.3.3"
+    "pm2": "5.4.3",
+    "ts-node": "10.9.2",
+    "tsup": "8.3.5",
+    "typescript": "5.6.3"
   }
 }
