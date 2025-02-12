@@ -1,47 +1,25 @@
 {
   "name": "backend",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
-  "main": "dist/server.js",
   "engines": {
     "node": "23.3.0"
   },
   "scripts": {
-    "start": "node dist/server.js",
-    "dev": "ts-node-dev src/server.ts",
-    "build": "tsc",
+    "build": "turbo build",
+    "dev": "turbo dev",
     "format": "biome format --write .",
-    "lint": "biome lint --write .",
-    "lint:unsafe": "biome lint --write --unsafe .",
-    "ci:check": "biome ci --formatter-enabled=false --linter-enabled=false",
-    "ci:format": "biome ci --linter-enabled=false --organize-imports-enabled=false",
-    "ci:lint": "biome ci --formatter-enabled=false --organize-imports-enabled=false",
-    "test": "jest"
+    "lint": "biome check --write .",
+    "lint:unsafe": "biome check --write --unsafe ."
   },
-  "keywords": [],
   "author": "",
-  "license": "ISC",
   "packageManager": "pnpm@10.3.0",
-  "dependencies": {
-    "@elizaos/core": "0.25.6-alpha.1",
-    "@goat-sdk/core": "^0.4.7",
-    "@goat-sdk/wallet-viem": "^0.2.8",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "express": "^4.21.2",
-    "radash": "^12.1.0",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1",
-    "viem": "^2.22.21",
-    "zod": "^3.24.1"
-  },
   "devDependencies": {
-    "@types/cors": "^2.8.17",
-    "@types/express": "^4.17.21",
-    "@types/node": "^20.11.0",
-    "@types/swagger-jsdoc": "^6.0.4",
-    "@types/swagger-ui-express": "^4.1.7",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.3.3"
-  }
+    "@biomejs/biome": "^1.9.4",
+    "dotenv": "^16.4.7",
+    "prettier": "^3.2.5",
+    "turbo": "^2.3.3",
+    "typescript": "5.5.4"
+  },
+  "workspaces": ["packages/*", "agent"]
 }

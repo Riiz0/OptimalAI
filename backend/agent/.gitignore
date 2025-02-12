@@ -1,0 +1,9 @@
+*.ts
+!index.ts
+!character.ts
+!nader.character.ts
+.env
+*.env
+.env*
+/data
+/generatedImages
