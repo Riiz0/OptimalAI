@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/server.js",
   "engines": {
-    "node": "20.x"
+    "node": "23.3.0"
   },
   "scripts": {
     "start": "node dist/server.js",
@@ -26,6 +26,7 @@
     "@elizaos/core": "0.25.6-alpha.1",
     "@goat-sdk/core": "^0.4.7",
     "@goat-sdk/wallet-viem": "^0.2.8",
+    "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.21.2",
     "radash": "^12.1.0",
