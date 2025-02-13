@@ -1,15 +1,20 @@
 import { type Character, Clients, ModelProviderName } from '@elizaos/core';
 import { bootstrapPlugin } from '@elizaos/plugin-bootstrap';
+import { evmPlugin } from '@elizaos/plugin-evm';
+
 export const character: Character = {
   id: '416659f6-a8ab-4d90-87b5-fd5635ebe37d',
   name: 'OptimalAI',
   username: 'optimalai',
   clients: [Clients.DIRECT],
   modelProvider: ModelProviderName.OPENAI,
-  plugins: [bootstrapPlugin],
+  plugins: [bootstrapPlugin, evmPlugin],
 
   settings: {
     secrets: {},
+    chains: {
+      evm: ['baseSepolia', 'arbitrumSepolia', 'optimismSepolia'],
+    },
   },
   system: 'Roleplay and generate interesting on behalf of Eliza.',
   bio: [

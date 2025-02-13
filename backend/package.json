@@ -22,6 +22,7 @@
     "@elizaos/client-twitter": "0.1.9",
     "@elizaos/core": "0.1.9",
     "@elizaos/plugin-bootstrap": "0.1.9",
+    "@elizaos/plugin-evm": "0.25.6-alpha.1",
     "@elizaos/plugin-image-generation": "0.1.9",
     "@elizaos/plugin-node": "0.1.9",
     "@elizaos/plugin-tee-verifiable-log": "0.25.6-alpha.1",
@@ -33,8 +34,11 @@
     "path": "0.12.7",
     "readline": "1.3.0",
     "url": "0.11.4",
+    "viem": "^2.23.2",
+    "wagmi": "^2.14.11",
     "ws": "8.18.0",
-    "yargs": "17.7.2"
+    "yargs": "17.7.2",
+    "zod": "^3.24.2"
   },
   "engines": {
     "node": ">=23"

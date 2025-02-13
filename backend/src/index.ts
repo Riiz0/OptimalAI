@@ -11,7 +11,9 @@ import {
   stringToUuid,
 } from '@elizaos/core';
 import { bootstrapPlugin } from '@elizaos/plugin-bootstrap';
+import { evmWalletProvider } from '@elizaos/plugin-evm';
 import { createNodePlugin } from '@elizaos/plugin-node';
+import { lendTokensAction } from './actions/lend-tokens.ts';
 import { initializeDbCache } from './cache/index.ts';
 import { character } from './character.ts';
 import { startChat } from './chat/index.ts';
@@ -55,8 +57,8 @@ export function createAgent(
     evaluators: [],
     character,
     plugins: [bootstrapPlugin, nodePlugin].filter(Boolean),
-    providers: [],
-    actions: [],
+    providers: [evmWalletProvider],
+    actions: [lendTokensAction],
     services: [],
     managers: [],
     cacheManager: cache,
