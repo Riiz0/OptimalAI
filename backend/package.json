@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts",
+    "dev": "tsx watch src/index.ts",
     "start": "tsc && node --loader ts-node/esm src/index.ts",
     "clean": "./scripts/clean.sh",
     "start:service:all": "pm2 start pnpm --name=\"all\" --restart-delay=3000 --max-restarts=10 -- run start:all",
-    "stop:service:all": "pm2 stop all"
+    "stop:service:all": "pm2 stop all",
+    "postinstall": "npm rebuild better-sqlite3"
   },
   "dependencies": {
     "@elizaos/adapter-postgres": "0.1.9",
@@ -22,9 +24,10 @@
     "@elizaos/plugin-bootstrap": "0.1.9",
     "@elizaos/plugin-image-generation": "0.1.9",
     "@elizaos/plugin-node": "0.1.9",
+    "@elizaos/plugin-tee-verifiable-log": "0.25.6-alpha.1",
     "@tavily/core": "0.0.2",
     "amqplib": "0.10.5",
-    "better-sqlite3": "11.5.0",
+    "better-sqlite3": "11.8.1",
     "fs": "0.0.1-security",
     "net": "1.0.2",
     "path": "0.12.7",
@@ -34,7 +37,7 @@
     "yargs": "17.7.2"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=23"
   },
   "pnpm": {
     "overrides": {
@@ -42,9 +45,11 @@
     }
   },
   "devDependencies": {
+    "@types/better-sqlite3": "7.6.12",
     "pm2": "5.4.3",
     "ts-node": "10.9.2",
     "tsup": "8.3.5",
+    "tsx": "^4.19.2",
     "typescript": "5.6.3"
   }
 }
