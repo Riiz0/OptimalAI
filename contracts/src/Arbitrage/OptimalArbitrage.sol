@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.22;
 
-import "@balancer/balancer-v2-monorepo/pkg/interfaces/contracts/vault/IVault.sol";
-import "@balancer/balancer-v2-monorepo/pkg/interfaces/contracts/vault/IFlashLoanRecipient.sol";
+import "@balancer/contracts/vault/IVault.sol";
+import "@balancer/contracts/vault/IFlashLoanRecipient.sol";
 import {ISwapRouter} from "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
+import {CrossChainManager} from "../superchain/CrosschainManager.sol";
 
 /**
  * @title OptimalArbitrage
@@ -15,7 +16,9 @@ import {ISwapRouter} from "@uniswap/v3-periphery/contracts/interfaces/ISwapRoute
  */
 contract OptimalArbitrage is IFlashLoanRecipient {
     /// @notice Address of the Balancer V2 Vault on Base Sepolia
-    IVault private constant balancerVault = IVault(0xBA12222222228d8Ba445958a75a0704d566BF2C8);
+    IVault private constant balancerVault =
+        IVault(0xBA12222222228d8Ba445958a75a0704d566BF2C8);
+    CrossChainManager public crossChainManager;
 
     /**
      * @dev A struct to define the parameters for a single arbitrage trade.
@@ -27,18 +30,79 @@ contract OptimalArbitrage is IFlashLoanRecipient {
         address[] dexRouters;
         address[] tokens;
         uint24 swapFee;
+        bool isCrossChain;
+        uint256 chainId;
+    }
+
+    // @dev SwapExecuted event emitted when a swap is executed successfully.
+    event SwapExecuted(
+        address inputToken,
+        address outputToken,
+        uint256 inputAmount,
+        uint256 outputAmount
+    );
+
+    // @dev CrossChainArbitrageInitiated event emitted when a cross-chain arbitrage trade is initiated.
+    event CrossChainArbitrageInitiated(
+        uint256 chainId,
+        address target,
+        bytes data
+    );
+
+    constructor(address _crossChainManager) {
+        crossChainManager = CrossChainManager(_crossChainManager); // Initialize CrossChainManager
     }
 
     /**
-     * @notice Emitted when a swap is successfully executed on a DEX.
-     * @param inputToken The address of the token being swapped.
-     * @param outputToken The address of the token received after the swap.
-     * @param inputAmount The amount of inputToken swapped.
-     * @param outputAmount The minimum amount of outputToken expected (slippage protection).
+     * @notice Initiates a cross-chain arbitrage trade.
+     * @param dexRouters Array of two DEX router addresses to use for the swaps.
+     * @param tokens Array of two token addresses defining the arbitrage path.
+     * @param swapFee The fee tier for the Uniswap V3 pool.
+     * @param loanAmount The amount of the first token to borrow via flash loan.
+     * @param chainId The chain ID of the destination chain.
      */
-    event SwapExecuted(address inputToken, address outputToken, uint256 inputAmount, uint256 outputAmount);
+    function startCrossChainArbitrage(
+        address[] memory dexRouters,
+        address[] memory tokens,
+        uint24 swapFee,
+        uint256 loanAmount,
+        uint256 chainId
+    ) internal {
+        // Bridge tokens to the destination chain.
+        crossChainManager.bridgeTokens(tokens[0], loanAmount, address(this));
 
-    constructor() {}
+        // Encode the trade parameters for the cross-chain message.
+        bytes memory tradeData = abi.encode(
+            ArbitrageTrade({
+                dexRouters: dexRouters,
+                tokens: tokens,
+                swapFee: swapFee,
+                isCrossChain: true,
+                chainId: chainId
+            })
+        );
+
+        // Send a cross-chain message to initiate arbitrage on the destination chain.
+        crossChainManager.sendCrossChainMessage(address(this), tradeData);
+        emit CrossChainArbitrageInitiated(chainId, address(this), tradeData);
+    }
+
+    /**
+     * @notice Executes a cross-chain arbitrage trade.
+     * @param tradeData Encoded trade parameters passed from the source chain.
+     */
+    function executeCrossChainArbitrage(bytes memory tradeData) external {
+        // Decode the trade parameters.
+        ArbitrageTrade memory trade = abi.decode(tradeData, (ArbitrageTrade));
+
+        // Perform the arbitrage trade on this chain.
+        performDirectArbitrage(
+            trade.dexRouters,
+            trade.tokens,
+            trade.swapFee,
+            IERC20(trade.tokens[0]).balanceOf(address(this))
+        );
+    }
 
     /**
      * @notice Performs an arbitrage trade without using a flash loan.
@@ -55,7 +119,13 @@ contract OptimalArbitrage is IFlashLoanRecipient {
         uint24 swapFee,
         uint256 tradeAmount
     ) internal {
-        ArbitrageTrade memory trade = ArbitrageTrade({dexRouters: dexRouters, tokens: tokens, swapFee: swapFee});
+        ArbitrageTrade memory trade = ArbitrageTrade({
+            dexRouters: dexRouters,
+            tokens: tokens,
+            swapFee: swapFee,
+            isCrossChain: false,
+            chainId: 0
+        });
 
         // First swap: Convert the borrowed token to an intermediate token.
         _executeSwap(
@@ -100,16 +170,17 @@ contract OptimalArbitrage is IFlashLoanRecipient {
         IERC20(inputToken).approve(router, inputAmount);
 
         // Configure the swap parameters.
-        ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams({
-            tokenIn: inputToken,
-            tokenOut: outputToken,
-            fee: fee,
-            recipient: address(this), // Send output tokens to this contract
-            deadline: block.timestamp, // Expire after the current block
-            amountIn: inputAmount,
-            amountOutMinimum: minOutput, // Minimum output for slippage protection
-            sqrtPriceLimitX96: 0 // No price limit (accept any slippage)
-        });
+        ISwapRouter.ExactInputSingleParams memory params = ISwapRouter
+            .ExactInputSingleParams({
+                tokenIn: inputToken,
+                tokenOut: outputToken,
+                fee: fee,
+                recipient: address(this), // Send output tokens to this contract
+                deadline: block.timestamp, // Expire after the current block
+                amountIn: inputAmount,
+                amountOutMinimum: minOutput, // Minimum output for slippage protection
+                sqrtPriceLimitX96: 0 // No price limit (accept any slippage)
+            });
 
         // Execute the swap.
         ISwapRouter(router).exactInputSingle(params);
@@ -124,11 +195,22 @@ contract OptimalArbitrage is IFlashLoanRecipient {
      * @param swapFee The fee tier for the Uniswap V3 pool.
      * @param loanAmount The amount of the first token to borrow via flash loan.
      */
-    function startArbitrage(address[] memory dexRouters, address[] memory tokens, uint24 swapFee, uint256 loanAmount)
-        internal
-    {
+    function startArbitrage(
+        address[] memory dexRouters,
+        address[] memory tokens,
+        uint24 swapFee,
+        uint256 loanAmount
+    ) internal {
         // Encode the trade parameters for the flash loan callback.
-        bytes memory tradeData = abi.encode(ArbitrageTrade({dexRouters: dexRouters, tokens: tokens, swapFee: swapFee}));
+        bytes memory tradeData = abi.encode(
+            ArbitrageTrade({
+                dexRouters: dexRouters,
+                tokens: tokens,
+                swapFee: swapFee,
+                isCrossChain: false,
+                chainId: 0
+            })
+        );
 
         // Configure the flash loan parameters.
         IERC20[] memory loanTokens = new IERC20[](1);
@@ -155,7 +237,10 @@ contract OptimalArbitrage is IFlashLoanRecipient {
         uint256[] memory feeAmounts,
         bytes memory tradeData
     ) external override {
-        require(msg.sender == address(balancerVault), "Unauthorized: Only Balancer Vault");
+        require(
+            msg.sender == address(balancerVault),
+            "Unauthorized: Only Balancer Vault"
+        );
 
         // Decode the trade parameters.
         ArbitrageTrade memory trade = abi.decode(tradeData, (ArbitrageTrade));
@@ -182,6 +267,9 @@ contract OptimalArbitrage is IFlashLoanRecipient {
         );
 
         // Repay the flash loan principal (WARNING: Flash loan fees are not accounted for).
-        IERC20(trade.tokens[0]).transfer(address(balancerVault), borrowedAmount);
+        IERC20(trade.tokens[0]).transfer(
+            address(balancerVault),
+            borrowedAmount
+        );
     }
 }

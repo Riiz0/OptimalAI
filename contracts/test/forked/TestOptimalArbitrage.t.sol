@@ -4,7 +4,7 @@ pragma solidity 0.8.22;
 import {Test, console} from "forge-std/Test.sol";
 import {StdUtils} from "forge-std/StdUtils.sol";
 import {SafeVault} from "../../src/SafeVault.sol";
-import {OptimalArbitrage} from "../../src/OptimalArbitrage.sol";
+import {OptimalArbitrage} from "../../src/Arbitrage/OptimalArbitrage.sol";
 import {HelperConfig} from "../../script/HelperConfig.s.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -22,7 +22,7 @@ contract ArbitrageTest is Test {
         networkConfig = helperConfig.getBaseSepoliaConfig();
         fork = vm.createSelectFork(BASE_SEPOLIA_RPC_URL_2);
         vm.startPrank(owner);
-        arbitrage = new OptimalArbitrage();
+        // arbitrage = new OptimalArbitrage(networkConfig.crossChainManager);
         vm.stopPrank();
         deal(networkConfig.usdc, user, 100 * 1e6);
     }

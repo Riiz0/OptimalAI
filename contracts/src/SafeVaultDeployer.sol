@@ -45,7 +45,9 @@ contract SafeVaultDeployer is HelperConfig {
      * @return vaultAddress The address of the newly created vault contract.
      * @custom:integration Integrates with Aave, Compound, and Uniswap protocols.
      */
-    function deployVault(address owner) external returns (address vaultAddress) {
+    function deployVault(
+        address owner
+    ) external returns (address vaultAddress) {
         // Deploy a new Vault instance with protocol addresses from the network config.
         SafeVault newVault = new SafeVault(
             owner,
@@ -53,7 +55,8 @@ contract SafeVaultDeployer is HelperConfig {
             currentNetworkConfig.aavePool,
             currentNetworkConfig.compoundUsdc,
             currentNetworkConfig.uniswapRouter,
-            currentNetworkConfig.uniswapFactory
+            currentNetworkConfig.uniswapFactory,
+            address(0)
         );
 
         // Register the new vault in the ownership mapping.
