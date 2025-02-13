@@ -38,10 +38,18 @@ contract SafeVault is Ownable, ProtocolHelper {
     error TransferFailed();
     error InsufficientTokensInVault(address token);
 
+    // modifier onlyWhitelisted(address _address) {
+    //     if (!isWhitelisted[_address]) {
+    //         revert OnlyWhitelistedAddresses();
+    //     }
+    //     _;
+    // }
+
     modifier onlyWhitelisted(address _address) {
-        if (!isWhitelisted[_address]) {
-            revert OnlyWhitelistedAddresses();
-        }
+        require(
+            _address == owner() || isWhitelisted[_address],
+            "Only whitelisted addresses can call this function"
+        );
         _;
     }
 
@@ -71,8 +79,7 @@ contract SafeVault is Ownable, ProtocolHelper {
         address _cUSDC,
         address _uniswapSwapRouter,
         address _uniswapPoolFactory,
-        address _INonfungiblePositionManager,
-        address _crossChainManager
+        address _INonfungiblePositionManager
     )
         Ownable(_owner)
         ProtocolHelper(
@@ -80,8 +87,7 @@ contract SafeVault is Ownable, ProtocolHelper {
             _cUSDC,
             _uniswapSwapRouter,
             _uniswapPoolFactory,
-            _INonfungiblePositionManager,
-            _crossChainManager
+            _INonfungiblePositionManager
         )
     {}
 
@@ -245,62 +251,52 @@ contract SafeVault is Ownable, ProtocolHelper {
             revert InsufficientTokensInVault(_token1);
         }
 
-        if (keccak256(bytes(protocol)) == keccak256(bytes("uniswap"))) {
-            if (
-                tokenAddressToInvestmentStruct[_token0]
-                    .uniswapPositionIds
-                    .length >
-                0 &&
-                tokenAddressToInvestmentStruct[_token1]
-                    .uniswapPositionIds
-                    .length ==
-                0
-            ) {
-                (
-                    uint256 tokenId,
-                    uint128 liquidity,
-                    uint256 amount0,
-                    uint256 amount1
-                ) = _mintNewPositionOnUniswap(
-                        _token0,
-                        _token1,
-                        _fee,
-                        _amount0,
-                        _amount1,
-                        _tickLower,
-                        _tickUpper
-                    );
+        bytes32 protocolHash = keccak256(bytes(protocol));
+
+        if (protocolHash == keccak256(bytes("uniswap"))) {
+            bool hasPosition0 = tokenAddressToInvestmentStruct[_token0]
+                .uniswapPositionIds
+                .length > 0;
+            bool hasPosition1 = tokenAddressToInvestmentStruct[_token1]
+                .uniswapPositionIds
+                .length > 0;
+
+            if (!hasPosition0 && !hasPosition1) {
+                // Both tokens are new positions, mint a new Uniswap LP position
+                (uint256 tokenId, , , ) = _mintNewPositionOnUniswap(
+                    _token0,
+                    _token1,
+                    _fee,
+                    _amount0,
+                    _amount1,
+                    _tickLower,
+                    _tickUpper
+                );
                 tokenAddressToInvestmentStruct[_token0].uniswapPositionIds.push(
                         tokenId
                     );
                 tokenAddressToInvestmentStruct[_token1].uniswapPositionIds.push(
                         tokenId
                     );
-            } else if (
-                tokenAddressToInvestmentStruct[_token0]
-                    .uniswapPositionIds
-                    .length >
-                0 &&
-                tokenAddressToInvestmentStruct[_token1]
-                    .uniswapPositionIds
-                    .length >
-                0
-            ) {
+            } else if (hasPosition0 && hasPosition1) {
+                // Both tokens already have Uniswap positions, increase liquidity
                 _increaseLiquidityToExistingPosition(
                     _token0,
                     _token1,
                     tokenAddressToInvestmentStruct[_token0].uniswapPositionIds[
                         0
-                    ],
+                    ], // Assuming first position ID is correct
                     _amount0,
                     _amount1
                 );
             }
-        } else if (
-            keccak256(bytes(protocol)) == keccak256(bytes("aerodrome"))
-        ) {
+        } else if (protocolHash == keccak256(bytes("aerodrome"))) {
             revert AerodromeNotImplementedYet();
+        } else {
+            revert InvalidProtocol("");
         }
+
+        // Deduct supplied amounts
         tokenAddressToInvestmentStruct[_token0].balanceUnderlying -= _amount0;
         tokenAddressToInvestmentStruct[_token1].balanceUnderlying -= _amount1;
     }

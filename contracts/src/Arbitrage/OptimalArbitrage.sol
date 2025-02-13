@@ -4,7 +4,6 @@ pragma solidity ^0.8.22;
 import "@balancer/contracts/vault/IVault.sol";
 import "@balancer/contracts/vault/IFlashLoanRecipient.sol";
 import {ISwapRouter} from "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
-import {CrossChainManager} from "../superchain/CrosschainManager.sol";
 
 /**
  * @title OptimalArbitrage
@@ -18,7 +17,6 @@ contract OptimalArbitrage is IFlashLoanRecipient {
     /// @notice Address of the Balancer V2 Vault on Base Sepolia
     IVault private constant balancerVault =
         IVault(0xBA12222222228d8Ba445958a75a0704d566BF2C8);
-    CrossChainManager public crossChainManager;
 
     /**
      * @dev A struct to define the parameters for a single arbitrage trade.
@@ -49,43 +47,7 @@ contract OptimalArbitrage is IFlashLoanRecipient {
         bytes data
     );
 
-    constructor(address _crossChainManager) {
-        crossChainManager = CrossChainManager(_crossChainManager); // Initialize CrossChainManager
-    }
-
-    /**
-     * @notice Initiates a cross-chain arbitrage trade.
-     * @param dexRouters Array of two DEX router addresses to use for the swaps.
-     * @param tokens Array of two token addresses defining the arbitrage path.
-     * @param swapFee The fee tier for the Uniswap V3 pool.
-     * @param loanAmount The amount of the first token to borrow via flash loan.
-     * @param chainId The chain ID of the destination chain.
-     */
-    function startCrossChainArbitrage(
-        address[] memory dexRouters,
-        address[] memory tokens,
-        uint24 swapFee,
-        uint256 loanAmount,
-        uint256 chainId
-    ) internal {
-        // Bridge tokens to the destination chain.
-        crossChainManager.bridgeTokens(tokens[0], loanAmount, address(this));
-
-        // Encode the trade parameters for the cross-chain message.
-        bytes memory tradeData = abi.encode(
-            ArbitrageTrade({
-                dexRouters: dexRouters,
-                tokens: tokens,
-                swapFee: swapFee,
-                isCrossChain: true,
-                chainId: chainId
-            })
-        );
-
-        // Send a cross-chain message to initiate arbitrage on the destination chain.
-        crossChainManager.sendCrossChainMessage(address(this), tradeData);
-        emit CrossChainArbitrageInitiated(chainId, address(this), tradeData);
-    }
+    constructor(address _crossChainManager) {}
 
     /**
      * @notice Executes a cross-chain arbitrage trade.

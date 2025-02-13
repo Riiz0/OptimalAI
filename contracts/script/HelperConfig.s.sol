@@ -21,6 +21,7 @@ contract HelperConfig is Script {
         address uniswapFactory; // Uniswap V3
         address uniswapRouter; //Uniswap V3
         address uniswapQouter; // Uniswap V3
+        address nonFungiblePositionManager; // Uniswap V3
         address aavePool; // Aave V3
         address agent;
     }
@@ -37,10 +38,31 @@ contract HelperConfig is Script {
             uniswapFactory: 0x4752ba5DBc23f44D87826276BF6Fd6b1C372aD24,
             uniswapRouter: 0x94cC0AaC535CCDB3C01d6787D6413C739ae12bc4,
             uniswapQouter: 0xC5290058841028F1614F3A6F0F5816cAd0df5E27,
+            nonFungiblePositionManager: 0x27F971cb582BF9E50F397e4d29a5C7A34f11faA2,
             aavePool: 0xbE781D7Bdf469f3d94a62Cdcc407aCe106AEcA74,
             agent: 0x7e393441Edc1Bb1621318E000cDfC74947f23b26
         });
         return BaseSepoliaConfig;
+    }
+
+    function getAvalancheFujiConfig()
+        public
+        pure
+        returns (NetworkConfig memory)
+    {
+        NetworkConfig memory AvalancheFujiConfig = NetworkConfig({
+            weth: 0x9668f5f55f2712Dd2dfa316256609b516292D554,
+            usdc: 0x5425890298aed601595a70AB815c96711a31Bc65,
+            aaveUsdc: 0x9CFcc1B289E59FBe1E769f020C77315DF8473760,
+            compoundUsdc: 0x270CE2B920E83Be464887ef2BC371F3413a96F9D,
+            uniswapFactory: address(0),
+            uniswapRouter: address(0),
+            uniswapQouter: address(0),
+            nonFungiblePositionManager: address(0),
+            aavePool: 0x8B9b2AF4afB389b4a70A474dfD4AdCD4a302bb40,
+            agent: 0x7e393441Edc1Bb1621318E000cDfC74947f23b26
+        });
+        return AvalancheFujiConfig;
     }
 
     function getOPSepoliaConfig() public pure returns (NetworkConfig memory) {
@@ -52,13 +74,18 @@ contract HelperConfig is Script {
             uniswapFactory: 0x4752ba5DBc23f44D87826276BF6Fd6b1C372aD24,
             uniswapRouter: 0x94cC0AaC535CCDB3C01d6787D6413C739ae12bc4,
             uniswapQouter: 0xC5290058841028F1614F3A6F0F5816cAd0df5E27,
+            nonFungiblePositionManager: address(0),
             aavePool: 0xbE781D7Bdf469f3d94a62Cdcc407aCe106AEcA74,
             agent: 0x7e393441Edc1Bb1621318E000cDfC74947f23b26
         });
         return OPSepoliaConfig;
     }
 
-    function getArbitrumSepoliaConfig() public pure returns (NetworkConfig memory) {
+    function getArbitrumSepoliaConfig()
+        public
+        pure
+        returns (NetworkConfig memory)
+    {
         NetworkConfig memory ArbitrumSepoliaConfig = NetworkConfig({
             weth: 0x1dF462e2712496373A347f8ad10802a5E95f053D,
             usdc: 0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d,
@@ -67,25 +94,11 @@ contract HelperConfig is Script {
             uniswapFactory: 0x248AB79Bbb9bC29bB72f7Cd42F17e054Fc40188e,
             uniswapRouter: 0x101F443B4d1b059569D643917553c771E1b9663E,
             uniswapQouter: 0x2779a0CC1c3e0E44D2542EC3e79e3864Ae93Ef0B,
+            nonFungiblePositionManager: 0x6b2937Bde17889EDCf8fbD8dE31C3C2a70Bc4d65,
             aavePool: 0xBfC91D59fdAA134A4ED45f7B584cAf96D7792Eff,
             agent: 0x7e393441Edc1Bb1621318E000cDfC74947f23b26
         });
         return ArbitrumSepoliaConfig;
-    }
-
-    function getAvaxFujiConfig() public pure returns (NetworkConfig memory) {
-        NetworkConfig memory AvaxFujiConfig = NetworkConfig({
-            weth: address(0),
-            usdc: 0x5425890298aed601595a70AB815c96711a31Bc65,
-            aaveUsdc: 0x9CFcc1B289E59FBe1E769f020C77315DF8473760,
-            compoundUsdc: address(0),
-            uniswapFactory: address(0),
-            uniswapRouter: address(0),
-            uniswapQouter: address(0),
-            aavePool: 0x8B9b2AF4afB389b4a70A474dfD4AdCD4a302bb40,
-            agent: address(77)
-        });
-        return AvaxFujiConfig;
     }
 
     function getETHSepoliaConfig() public pure returns (NetworkConfig memory) {
@@ -97,6 +110,7 @@ contract HelperConfig is Script {
             uniswapFactory: address(0),
             uniswapRouter: address(0),
             uniswapQouter: address(0),
+            nonFungiblePositionManager: address(0),
             aavePool: 0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951,
             agent: address(77)
         });
@@ -116,6 +130,7 @@ contract HelperConfig is Script {
             uniswapFactory: address(2),
             uniswapRouter: address(3),
             uniswapQouter: address(6),
+            nonFungiblePositionManager: address(0),
             aavePool: address(7),
             agent: address(77)
         });

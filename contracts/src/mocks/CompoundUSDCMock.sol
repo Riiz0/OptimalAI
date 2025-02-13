@@ -10,7 +10,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * @notice Mock compound usdc for testing
  */
 contract CompoundUSDCMock is ERC20 {
-    constructor() ERC20("Test USDC", "tUSDCv3") {}
+    constructor() ERC20("Compound USDC", "cUSDCv3") {}
 
     function mint(address to, uint256 amount) public {
         _mint(to, amount);
@@ -21,7 +21,10 @@ contract CompoundUSDCMock is ERC20 {
     }
 
     function supplyTo(address dst, address asset, uint256 amount) public {
-        require(IERC20(asset).allowance(msg.sender, address(this)) >= amount, "ERC20: insufficient allowance");
+        require(
+            IERC20(asset).allowance(msg.sender, address(this)) >= amount,
+            "ERC20: insufficient allowance"
+        );
         IERC20(asset).transferFrom(msg.sender, address(this), amount);
         _mint(dst, amount);
     }

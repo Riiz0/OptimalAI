@@ -34,7 +34,7 @@ contract SafeVaultDeployer is HelperConfig {
      *      Currently hardcoded to Base Sepolia, but can be extended for other networks.
      */
     constructor() {
-        currentNetworkConfig = getBaseSepoliaConfig();
+        currentNetworkConfig = getArbitrumSepoliaConfig();
     }
 
     /**
@@ -51,12 +51,11 @@ contract SafeVaultDeployer is HelperConfig {
         // Deploy a new Vault instance with protocol addresses from the network config.
         SafeVault newVault = new SafeVault(
             owner,
-            currentNetworkConfig.agent,
             currentNetworkConfig.aavePool,
             currentNetworkConfig.compoundUsdc,
             currentNetworkConfig.uniswapRouter,
             currentNetworkConfig.uniswapFactory,
-            address(0)
+            currentNetworkConfig.nonFungiblePositionManager
         );
 
         // Register the new vault in the ownership mapping.

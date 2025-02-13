@@ -8,7 +8,6 @@ import {ISwapRouter} from "@uniswap/v3-periphery/contracts/interfaces/ISwapRoute
 import {IUniswapV3Pool} from "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 import {IUniswapV3Factory} from "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
 import {INonfungiblePositionManager} from "./interfaces/INonfungiblePositionManager.sol";
-import {CrossChainManager} from "./superchain/CrosschainManager.sol";
 import {LiquidityAmounts} from "./lib/LiquidityAmounts.sol";
 import {TickMath} from "./lib/TickMath.sol";
 
@@ -32,8 +31,6 @@ contract ProtocolHelper {
     ISwapRouter public immutable uniswapSwapRouter;
     IUniswapV3Factory public immutable uniswapPoolFactory;
     INonfungiblePositionManager public immutable nonFungiblePositionManager;
-
-    CrossChainManager public crossChainManager;
 
     event TokensSwappedOnDoubleTokenDex(
         string protocol,
@@ -84,8 +81,7 @@ contract ProtocolHelper {
         address _cUSDC,
         address _uniswapSwapRouter,
         address _uniswapPoolFactory,
-        address _INonfungiblePositionManager,
-        address _crossChainManager
+        address _INonfungiblePositionManager
     ) {
         aaveLiquidityPool = IPool(_aaveLiquidityPool);
         cUSDC = CometMainInterface(_cUSDC);
@@ -94,57 +90,6 @@ contract ProtocolHelper {
         nonFungiblePositionManager = INonfungiblePositionManager(
             _INonfungiblePositionManager
         );
-        crossChainManager = CrossChainManager(_crossChainManager);
-    }
-
-    /**
-     * @notice Lend token on Aave V3 on another chain.
-     * @param _token Token to lend.
-     * @param _amount Amount of token to lend.
-     * @param _chainId Chain ID of the destination chain.
-     */
-    function _lendTokenOnAaveCrossChain(
-        address _token,
-        uint256 _amount,
-        uint256 _chainId
-    ) internal {
-        /// @dev Bridge tokens to the destination chain.
-        crossChainManager.bridgeTokens(_token, _amount, address(this));
-
-        /// @dev Encode the function call for lending on the destination chain.
-        bytes memory data = abi.encodeWithSignature(
-            "lendTokenOnAave(address,uint256)",
-            _token,
-            _amount
-        );
-
-        /// @dev Send a cross-chain message to execute the lending function.
-        crossChainManager.sendCrossChainMessage(address(this), data);
-    }
-
-    /**
-     * @notice Lend token on Compound on another chain.
-     * @param _token Token to lend.
-     * @param _amount Amount of token to lend.
-     * @param _chainId Chain ID of the destination chain.
-     */
-    function _lendTokenOnCompoundCrossChain(
-        address _token,
-        uint256 _amount,
-        uint256 _chainId
-    ) internal {
-        /// @dev Bridge tokens to the destination chain.
-        crossChainManager.bridgeTokens(_token, _amount, address(this));
-
-        /// @dev Encode the function call for lending on the destination chain.
-        bytes memory data = abi.encodeWithSignature(
-            "lendTokenOnCompound(address,uint256)",
-            _token,
-            _amount
-        );
-
-        /// @dev Send a cross-chain message to execute the lending function.
-        crossChainManager.sendCrossChainMessage(address(this), data);
     }
 
     /**
@@ -276,8 +221,8 @@ contract ProtocolHelper {
                 tickUpper: _tickUpper,
                 amount0Desired: _amount0,
                 amount1Desired: _amount1,
-                amount0Min: _amount0,
-                amount1Min: _amount1,
+                amount0Min: 0,
+                amount1Min: 0,
                 recipient: address(this),
                 deadline: block.timestamp
             });
