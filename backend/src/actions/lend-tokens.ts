@@ -20,15 +20,7 @@ export class LendTokensAction {
   }
 
   async lendTokens(params: LendTokensParams, message: Memory, state?: State) {
-    const walletClient = this.walletProvider.getWalletClient(params.chain);
-
-    elizaLogger.info('Lending with params:', {
-      userData,
-      strategies,
-      apys,
-      params,
-      walletAddress: walletClient.account.address,
-    });
+    // const walletClient = this.walletProvider.getWalletClient(params.chain);
 
     // TODO: Implement actual lending logic
     return true;
@@ -42,7 +34,7 @@ export const lendTokensAction: Action = {
     'Lends on tokens using our vault API (support Aave, Compound on Base, Arbitrum, Optimism (OP))',
 
   // Validate input before triggering action
-  validate: async (runtime: IAgentRuntime, message: Memory) => {
+  validate: async () => {
     return true;
   },
 

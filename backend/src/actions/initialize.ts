@@ -8,9 +8,9 @@ import {
   composeContext,
   generateObject,
 } from '@elizaos/core';
-import type { z } from 'zod';
 import { getTypedDbAdapter } from '../adapters/extended-sqlite-adapter';
 import { initializeTemplate } from '../templates/initialize-template';
+import type { UserState } from '../types/user-state';
 import { userStateSchema } from '../validators/user-state-schema';
 
 export const initializeAction: Action = {
@@ -28,7 +28,7 @@ export const initializeAction: Action = {
   handler: async (
     runtime: IAgentRuntime,
     message: Memory,
-    state?: State,
+    state: State,
     _options: {
       [key: string]: unknown;
     },
@@ -63,7 +63,7 @@ export const initializeAction: Action = {
       context,
       modelClass: ModelClass.SMALL,
       schema: userStateSchema,
-    })) as { object: z.infer<typeof userStateSchema> };
+    })) as { object: UserState };
 
     if (!object) {
       callback({

@@ -90,7 +90,7 @@ export const initializeVaultAction: Action = {
   handler: async (
     runtime: IAgentRuntime,
     message: Memory,
-    state?: State,
+    state: State,
     _options: {
       [key: string]: unknown;
     },

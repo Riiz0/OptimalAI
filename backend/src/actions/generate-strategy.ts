@@ -9,9 +9,9 @@ import {
   elizaLogger,
   generateObject,
 } from '@elizaos/core';
-import type { z } from 'zod';
 import { getTypedDbAdapter } from '../adapters/extended-sqlite-adapter';
 import { generateStrategyTemplate } from '../templates/generate-strategy-template';
+import type { Strategy } from '../types/strategy';
 import { strategySchema } from '../validators/strategy-schema';
 import {} from '../validators/wallet-address-schema';
 
@@ -53,7 +53,7 @@ export const generateStrategyAction: Action = {
         context: strategyContext,
         modelClass: ModelClass.LARGE,
         schema: strategySchema,
-      })) as { object: z.infer<typeof strategySchema> };
+      })) as { object: Strategy };
 
       const dbAdapter = getTypedDbAdapter(runtime);
       await dbAdapter.updateUserStrategy(message.userId, object);

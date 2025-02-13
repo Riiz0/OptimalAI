@@ -13,7 +13,6 @@ import { getTypedDbAdapter } from '../adapters/extended-sqlite-adapter';
 import { assignStrategyTemplate } from '../templates/assign-strategy-template';
 import type { Strategy } from '../types/strategy';
 import { strategySchema } from '../validators/strategy-schema';
-import {} from '../validators/wallet-address-schema';
 
 export const assignStrategyAction: Action = {
   name: 'ASSIGN_STRATEGY',
