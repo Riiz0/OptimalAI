@@ -16,6 +16,7 @@ import { createNodePlugin } from '@elizaos/plugin-node';
 import { assignStrategyAction } from './actions/assign-strategy.ts';
 import { generateStrategyAction } from './actions/generate-strategy.ts';
 import { initializeVaultAction } from './actions/initialize-vault.ts';
+import { initializeAction } from './actions/initialize.ts';
 import { lendTokensAction } from './actions/lend-tokens.ts';
 import { initializeDbCache } from './cache/index.ts';
 import { character } from './character.ts';
@@ -62,6 +63,7 @@ export function createAgent(
     plugins: [bootstrapPlugin, nodePlugin].filter(Boolean),
     providers: [evmWalletProvider],
     actions: [
+      initializeAction,
       lendTokensAction,
       generateStrategyAction,
       initializeVaultAction,

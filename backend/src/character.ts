@@ -9,7 +9,6 @@ export const character: Character = {
   clients: [Clients.DIRECT],
   modelProvider: ModelProviderName.OPENAI,
   plugins: [bootstrapPlugin, evmPlugin],
-
   settings: {
     secrets: {},
     chains: {

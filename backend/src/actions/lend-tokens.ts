@@ -12,15 +12,26 @@ import { type WalletProvider, initWalletProvider } from '@elizaos/plugin-evm';
 import { lendTokensTemplate } from '../templates/lend-tokens-template';
 import type { LendTokensParams } from '../types/lend-tokens-params';
 
-const vaultFactoryAddress = '0x794a6135D5174c12e1862791311317C63615cb3f';
-
 export class LendTokensAction {
-  constructor(private walletProvider: WalletProvider) {}
+  private walletProvider: WalletProvider;
 
-  async lendTokens(params: LendTokensParams) {
-    console.log('LendTokensAction lendTokens', params);
+  constructor(walletProvider: WalletProvider) {
+    this.walletProvider = walletProvider;
+  }
+
+  async lendTokens(params: LendTokensParams, message: Memory, state?: State) {
     const walletClient = this.walletProvider.getWalletClient(params.chain);
-    console.log('address is', walletClient.account.address);
+
+    elizaLogger.info('Lending with params:', {
+      userData,
+      strategies,
+      apys,
+      params,
+      walletAddress: walletClient.account.address,
+    });
+
+    // TODO: Implement actual lending logic
+    return true;
   }
 }
 
@@ -50,7 +61,7 @@ export const lendTokensAction: Action = {
         modelClass: ModelClass.LARGE,
       });
 
-      await action.lendTokens(content);
+      await action.lendTokens({ ...content }, message, state);
 
       // const provider = runtime.providers.getProvider('baseSepolia');
       //   const provider = new ethers.JsonRpcProvider(

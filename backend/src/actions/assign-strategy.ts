@@ -21,16 +21,22 @@ export const assignStrategyAction: Action = {
   description: 'Assign an investment strategy to the user',
 
   validate: async (runtime: IAgentRuntime, message: Memory) => {
+    if (!message.userId) {
+      return false;
+    }
     const dbAdapter = getTypedDbAdapter(runtime);
-    const userData = await dbAdapter.getOrCreateUserState(message.userId);
-    return !userData?.walletAddress; // Only valid if user exists
+    const userData = await dbAdapter.getUserById(message.userId);
+    if (!userData || !userData.walletAddress || !userData.chainName) {
+      return false;
+    }
+    return true;
   },
 
   handler: async (
     runtime: IAgentRuntime,
     message: Memory,
     state: State,
-    options: {
+    _options: {
       [key: string]: unknown;
     },
     callback: HandlerCallback,

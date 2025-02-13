@@ -11,19 +11,18 @@ export class ExtendedSqliteAdapter extends SqliteDatabaseAdapter {
     this.db.exec(seedDb);
   }
 
-  async getOrCreateUserState(userId: UUID): Promise<UserState> {
-    const userState = await this.getUserById(userId);
-    if (userState) {
-      return userState;
+  async getOrCreateUserState(
+    userId: UUID,
+    userState?: UserState,
+  ): Promise<UserState> {
+    const dbState = await this.getUserById(userId);
+    if (dbState) {
+      return dbState;
     }
-    const account = await this.getAccountById(userId);
-    if (!account) {
-      throw new Error('Account not found');
+    if (!userState) {
+      throw new Error('Need data to create user state');
     }
-    // TODO Should add validation on account name to make sure it's an address
-    await this.createUserState(userId, {
-      walletAddress: account.name as Address,
-    });
+    await this.createUserState(userId, userState);
     return this.getUserById(userId);
   }
 
@@ -32,7 +31,6 @@ export class ExtendedSqliteAdapter extends SqliteDatabaseAdapter {
     const userState = this.db.prepare(sql).get(userId) as UserState;
     if (userState) {
       if (typeof userState.strategy === 'string') {
-        console.log('parsing strategy');
         userState.strategy = JSON.parse(
           userState.strategy as unknown as string,
         );
@@ -44,13 +42,14 @@ export class ExtendedSqliteAdapter extends SqliteDatabaseAdapter {
   async createUserState(userId: UUID, userState: UserState) {
     try {
       const sql =
-        'INSERT INTO user (userId, walletAddress, vaultAddress, strategy) VALUES (?, ?, ?, ?)';
+        'INSERT INTO user (userId, walletAddress, vaultAddress, chainName, strategy) VALUES (?, ?, ?, ?, ?)';
       this.db
         .prepare(sql)
         .run(
           userId,
           userState.walletAddress,
           userState.vaultAddress,
+          userState.chainName,
           JSON.stringify(userState.strategy),
         );
 

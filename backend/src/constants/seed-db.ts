@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS "user" (
     "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "walletAddress" TEXT,
     "vaultAddress" TEXT,
+    "chainName" TEXT,
     "strategy" TEXT DEFAULT '{}' CHECK(json_valid("strategy")) -- Ensuring details is a valid JSON field,
 );
 
