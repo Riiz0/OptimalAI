@@ -19,7 +19,7 @@ contract SafeVault is Ownable, ProtocolHelper {
         uint256 balanceUnderlying;
         uint256 balanceInvestedInAave;
         uint256 balanceInvestedInCompound;
-        uint256 balanceInvestedInUniswap;
+        uint256[] uniswapPositionIds;
     }
 
     /// @notice Mapping from token address to investment struct.
@@ -33,6 +33,7 @@ contract SafeVault is Ownable, ProtocolHelper {
     error InvalidProtocol(string protocol);
     error AerodromeNotImplementedYet();
     error OnlyWhitelistedAddresses();
+    error NoPosition();
     // error TokensNotApproved();
     error TransferFailed();
     error InsufficientTokensInVault(address token);
@@ -46,8 +47,8 @@ contract SafeVault is Ownable, ProtocolHelper {
 
     modifier validLendingProtocol(string memory protocol) {
         if (
-            keccak256(bytes(protocol)) != keccak256(bytes("aave"))
-                && keccak256(bytes(protocol)) != keccak256(bytes("compound"))
+            keccak256(bytes(protocol)) != keccak256(bytes("aave")) &&
+            keccak256(bytes(protocol)) != keccak256(bytes("compound"))
         ) {
             revert InvalidProtocol(protocol);
         }
@@ -56,8 +57,8 @@ contract SafeVault is Ownable, ProtocolHelper {
 
     modifier validLiquidityProtocol(string memory protocol) {
         if (
-            keccak256(bytes(protocol)) != keccak256(bytes("uniswap"))
-                && keccak256(bytes(protocol)) != keccak256(bytes("aerodrome"))
+            keccak256(bytes(protocol)) != keccak256(bytes("uniswap")) &&
+            keccak256(bytes(protocol)) != keccak256(bytes("aerodrome"))
         ) {
             revert InvalidProtocol(protocol);
         }
@@ -70,10 +71,18 @@ contract SafeVault is Ownable, ProtocolHelper {
         address _cUSDC,
         address _uniswapSwapRouter,
         address _uniswapPoolFactory,
-        address _INonfungiblePositionManager
+        address _INonfungiblePositionManager,
+        address _crossChainManager
     )
         Ownable(_owner)
-        ProtocolHelper(_aaveLiquidityPool, _cUSDC, _uniswapSwapRouter, _uniswapPoolFactory, _INonfungiblePositionManager)
+        ProtocolHelper(
+            _aaveLiquidityPool,
+            _cUSDC,
+            _uniswapSwapRouter,
+            _uniswapPoolFactory,
+            _INonfungiblePositionManager,
+            _crossChainManager
+        )
     {}
 
     /**
@@ -100,11 +109,18 @@ contract SafeVault is Ownable, ProtocolHelper {
      * @param _token Token address to deposit.
      * @param _amount Amount of token to deposit.
      */
-    function depositERC20intoVault(address _token, uint256 _amount) external onlyOwner {
+    function depositERC20intoVault(
+        address _token,
+        uint256 _amount
+    ) external onlyOwner {
         if (IERC20(_token).allowance(msg.sender, address(this)) < _amount) {
             revert TokensNotApproved("Vault");
         }
-        bool success = IERC20(_token).transferFrom(msg.sender, address(this), _amount);
+        bool success = IERC20(_token).transferFrom(
+            msg.sender,
+            address(this),
+            _amount
+        );
         if (!success) {
             revert TransferFailed();
         }
@@ -118,8 +134,13 @@ contract SafeVault is Ownable, ProtocolHelper {
      * @param _token Token address to withdraw.
      * @param _amount Amount of token to withdraw.
      */
-    function withdrawERC20FromVault(address _token, uint256 _amount) external onlyOwner {
-        if (tokenAddressToInvestmentStruct[_token].balanceUnderlying < _amount) {
+    function withdrawERC20FromVault(
+        address _token,
+        uint256 _amount
+    ) external onlyOwner {
+        if (
+            tokenAddressToInvestmentStruct[_token].balanceUnderlying < _amount
+        ) {
             revert InsufficientTokensInVault(_token);
         }
         IERC20(_token).approve(owner(), _amount);
@@ -138,20 +159,24 @@ contract SafeVault is Ownable, ProtocolHelper {
      * @param _token The token to lend.
      * @param _amount The amount of token to lend.
      */
-    function lendERC20(string memory protocol, address _token, uint256 _amount)
-        external
-        onlyWhitelisted(msg.sender)
-        validLendingProtocol(protocol)
-    {
-        if (tokenAddressToInvestmentStruct[_token].balanceUnderlying < _amount) {
+    function lendERC20(
+        string memory protocol,
+        address _token,
+        uint256 _amount
+    ) external onlyWhitelisted(msg.sender) validLendingProtocol(protocol) {
+        if (
+            tokenAddressToInvestmentStruct[_token].balanceUnderlying < _amount
+        ) {
             revert InsufficientTokensInVault(_token);
         }
         if (keccak256(bytes(protocol)) == keccak256(bytes("aave"))) {
-            lendTokenOnAave(_token, _amount);
-            tokenAddressToInvestmentStruct[_token].balanceInvestedInAave += _amount;
+            _lendTokenOnAave(_token, _amount);
+            tokenAddressToInvestmentStruct[_token]
+                .balanceInvestedInAave += _amount;
         } else if (keccak256(bytes(protocol)) == keccak256(bytes("compound"))) {
-            lendTokenOnCompound(_token, _amount);
-            tokenAddressToInvestmentStruct[_token].balanceInvestedInCompound += _amount;
+            _lendTokenOnCompound(_token, _amount);
+            tokenAddressToInvestmentStruct[_token]
+                .balanceInvestedInCompound += _amount;
         }
         tokenAddressToInvestmentStruct[_token].balanceUnderlying -= _amount;
     }
@@ -163,20 +188,27 @@ contract SafeVault is Ownable, ProtocolHelper {
      * @param _token The token to withdraw.
      * @param _amount The amount of token to withdraw.
      */
-    function withdrawLentERC20(string memory protocol, address _token, uint256 _amount)
+    function withdrawLentERC20(
+        string memory protocol,
+        address _token,
+        uint256 _amount
+    )
         external
         onlyWhitelisted(msg.sender)
         validLendingProtocol(protocol)
         returns (uint256 amountWithdrawn)
     {
         if (keccak256(bytes(protocol)) == keccak256(bytes("aave"))) {
-            amountWithdrawn = withdrawLentTokensOnAave(_token, _amount);
-            tokenAddressToInvestmentStruct[_token].balanceInvestedInAave -= _amount;
+            amountWithdrawn = _withdrawLentTokensOnAave(_token, _amount);
+            tokenAddressToInvestmentStruct[_token]
+                .balanceInvestedInAave -= _amount;
         } else if (keccak256(bytes(protocol)) == keccak256(bytes("compound"))) {
-            amountWithdrawn = withdrawLentTokensOnCompound(_token, _amount);
-            tokenAddressToInvestmentStruct[_token].balanceInvestedInCompound -= _amount;
+            amountWithdrawn = _withdrawLentTokensOnCompound(_token, _amount);
+            tokenAddressToInvestmentStruct[_token]
+                .balanceInvestedInCompound -= _amount;
         }
-        tokenAddressToInvestmentStruct[_token].balanceUnderlying += amountWithdrawn;
+        tokenAddressToInvestmentStruct[_token]
+            .balanceUnderlying += amountWithdrawn;
         return amountWithdrawn;
     }
 
@@ -202,18 +234,71 @@ contract SafeVault is Ownable, ProtocolHelper {
         int24 _tickLower,
         int24 _tickUpper
     ) external onlyWhitelisted(msg.sender) validLiquidityProtocol(protocol) {
-        if (tokenAddressToInvestmentStruct[_token0].balanceUnderlying < _amount0) {
+        if (
+            tokenAddressToInvestmentStruct[_token0].balanceUnderlying < _amount0
+        ) {
             revert InsufficientTokensInVault(_token0);
         }
-        if (tokenAddressToInvestmentStruct[_token1].balanceUnderlying < _amount1) {
+        if (
+            tokenAddressToInvestmentStruct[_token1].balanceUnderlying < _amount1
+        ) {
             revert InsufficientTokensInVault(_token1);
         }
 
         if (keccak256(bytes(protocol)) == keccak256(bytes("uniswap"))) {
-            addLiquidityOnUniswap(_token0, _token1, _amount0, _amount1, _fee, _tickLower, _tickUpper);
-            tokenAddressToInvestmentStruct[_token0].balanceInvestedInUniswap += _amount0;
-            tokenAddressToInvestmentStruct[_token1].balanceInvestedInUniswap += _amount1;
-        } else if (keccak256(bytes(protocol)) == keccak256(bytes("aerodrome"))) {
+            if (
+                tokenAddressToInvestmentStruct[_token0]
+                    .uniswapPositionIds
+                    .length >
+                0 &&
+                tokenAddressToInvestmentStruct[_token1]
+                    .uniswapPositionIds
+                    .length ==
+                0
+            ) {
+                (
+                    uint256 tokenId,
+                    uint128 liquidity,
+                    uint256 amount0,
+                    uint256 amount1
+                ) = _mintNewPositionOnUniswap(
+                        _token0,
+                        _token1,
+                        _fee,
+                        _amount0,
+                        _amount1,
+                        _tickLower,
+                        _tickUpper
+                    );
+                tokenAddressToInvestmentStruct[_token0].uniswapPositionIds.push(
+                        tokenId
+                    );
+                tokenAddressToInvestmentStruct[_token1].uniswapPositionIds.push(
+                        tokenId
+                    );
+            } else if (
+                tokenAddressToInvestmentStruct[_token0]
+                    .uniswapPositionIds
+                    .length >
+                0 &&
+                tokenAddressToInvestmentStruct[_token1]
+                    .uniswapPositionIds
+                    .length >
+                0
+            ) {
+                _increaseLiquidityToExistingPosition(
+                    _token0,
+                    _token1,
+                    tokenAddressToInvestmentStruct[_token0].uniswapPositionIds[
+                        0
+                    ],
+                    _amount0,
+                    _amount1
+                );
+            }
+        } else if (
+            keccak256(bytes(protocol)) == keccak256(bytes("aerodrome"))
+        ) {
             revert AerodromeNotImplementedYet();
         }
         tokenAddressToInvestmentStruct[_token0].balanceUnderlying -= _amount0;
@@ -241,8 +326,37 @@ contract SafeVault is Ownable, ProtocolHelper {
         returns (uint256 amount0, uint256 amount1)
     {
         if (keccak256(bytes(protocol)) == keccak256(bytes("uniswap"))) {
-            (amount0, amount1) = withdrawLiquidityFromUniswap(_token0, _token1, _fee, _liquidityAmount);
-        } else if (keccak256(bytes(protocol)) == keccak256(bytes("aerodrome"))) {
+            if (
+                tokenAddressToInvestmentStruct[_token0]
+                    .uniswapPositionIds
+                    .length >
+                0 &&
+                tokenAddressToInvestmentStruct[_token1]
+                    .uniswapPositionIds
+                    .length >
+                0
+            ) {
+                (amount0, amount1) = _decreaseLiquidityFromUniswap(
+                    tokenAddressToInvestmentStruct[_token0].uniswapPositionIds[
+                        0
+                    ],
+                    _liquidityAmount,
+                    0,
+                    0
+                );
+                (
+                    uint256 amount0Collected,
+                    uint256 amount1Collected
+                ) = _collectTokensFromPosition(
+                        tokenAddressToInvestmentStruct[_token0]
+                            .uniswapPositionIds[0]
+                    );
+            } else {
+                revert NoPosition();
+            }
+        } else if (
+            keccak256(bytes(protocol)) == keccak256(bytes("aerodrome"))
+        ) {
             revert AerodromeNotImplementedYet();
         }
         tokenAddressToInvestmentStruct[_token0].balanceUnderlying += amount0;
@@ -262,17 +376,34 @@ contract SafeVault is Ownable, ProtocolHelper {
         address _tokenOut,
         uint256 _amountIn,
         uint24 _fee
-    ) external onlyWhitelisted(msg.sender) validLiquidityProtocol(protocol) returns (uint256 amountOut) {
-        if (tokenAddressToInvestmentStruct[_tokenIn].balanceUnderlying < _amountIn) {
+    )
+        external
+        onlyWhitelisted(msg.sender)
+        validLiquidityProtocol(protocol)
+        returns (uint256 amountOut)
+    {
+        if (
+            tokenAddressToInvestmentStruct[_tokenIn].balanceUnderlying <
+            _amountIn
+        ) {
             revert InsufficientTokensInVault(_tokenIn);
         }
         if (keccak256(bytes(protocol)) == keccak256(bytes("uniswap"))) {
-            amountOut = executeSwapOnUniswap(_tokenIn, _tokenOut, _amountIn, 1, _fee);
-        } else if (keccak256(bytes(protocol)) == keccak256(bytes("aerodrome"))) {
+            amountOut = _executeSwapOnUniswap(
+                _tokenIn,
+                _tokenOut,
+                _amountIn,
+                1,
+                _fee
+            );
+        } else if (
+            keccak256(bytes(protocol)) == keccak256(bytes("aerodrome"))
+        ) {
             revert AerodromeNotImplementedYet();
         }
         tokenAddressToInvestmentStruct[_tokenIn].balanceUnderlying -= _amountIn;
-        tokenAddressToInvestmentStruct[_tokenOut].balanceUnderlying += amountOut;
+        tokenAddressToInvestmentStruct[_tokenOut]
+            .balanceUnderlying += amountOut;
     }
 
     /**
@@ -282,11 +413,16 @@ contract SafeVault is Ownable, ProtocolHelper {
      * @param _fee The fee to do arbitrage on.
      * @param _amount The amount to do arbitrage on.
      */
-    function doArbitrage(address[] memory _routerPath, address[] memory _tokenPath, uint24 _fee, uint256 _amount)
-        external
-        onlyWhitelisted(msg.sender)
-    {
-        if (tokenAddressToInvestmentStruct[_tokenPath[0]].balanceUnderlying < _amount) {
+    function doArbitrage(
+        address[] memory _routerPath,
+        address[] memory _tokenPath,
+        uint24 _fee,
+        uint256 _amount
+    ) external onlyWhitelisted(msg.sender) {
+        if (
+            tokenAddressToInvestmentStruct[_tokenPath[0]].balanceUnderlying <
+            _amount
+        ) {
             revert InsufficientTokensInVault(_tokenPath[0]);
         }
         // ArbitrageWithoutFlashLoan(_routerPath, _tokenPath, _fee, _amount);
@@ -297,7 +433,9 @@ contract SafeVault is Ownable, ProtocolHelper {
      * @param _token Token address to get the struct details for.
      * @return investmentStruct Struct details for the token.
      */
-    function getUserStruct(address _token) external view returns (Investment memory) {
+    function getUserStruct(
+        address _token
+    ) external view returns (Investment memory) {
         return tokenAddressToInvestmentStruct[_token];
     }
 }

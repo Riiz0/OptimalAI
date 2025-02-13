@@ -1,10 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.22;
 
-import {ICrossDomainMessenger} from
-    "@ethereum-optimism/optimism/packages/contracts-bedrock/src/universal/interfaces/ICrossDomainMessenger.sol";
-import {IStandardBridge} from
-    "@ethereum-optimism/optimism/packages/contracts-bedrock/src/universal/interfaces/IStandardBridge.sol";
+import {ICrossDomainMessenger} from "./interfaces/ICrossDomainMessenger.sol";
+import {IStandardBridge} from "./interfaces/IStandardBridge.sol";
 
 contract CrossChainManager {
     address public owner;
@@ -33,7 +31,11 @@ contract CrossChainManager {
      * @param amount The amount of tokens to bridge.
      * @param recipient The address to receive the tokens on the destination chain.
      */
-    function bridgeTokens(address token, uint256 amount, address recipient) external {
+    function bridgeTokens(
+        address token,
+        uint256 amount,
+        address recipient
+    ) external {
         require(msg.sender == owner, "Unauthorized");
         bridge.bridgeERC20To(token, token, recipient, amount, 1000000, ""); // Gas limit for the deposit
     }
