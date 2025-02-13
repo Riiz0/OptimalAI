@@ -4,6 +4,7 @@ pragma solidity ^0.8.22;
 import "@balancer/balancer-v2-monorepo/pkg/interfaces/contracts/vault/IVault.sol";
 import "@balancer/balancer-v2-monorepo/pkg/interfaces/contracts/vault/IFlashLoanRecipient.sol";
 import {ISwapRouter} from "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
+import {CrossChainManager} from "./superchain/CrosschainManager.sol";
 
 /**
  * @title OptimalArbitrage
@@ -16,6 +17,7 @@ import {ISwapRouter} from "@uniswap/v3-periphery/contracts/interfaces/ISwapRoute
 contract OptimalArbitrage is IFlashLoanRecipient {
     /// @notice Address of the Balancer V2 Vault on Base Sepolia
     IVault private constant balancerVault = IVault(0xBA12222222228d8Ba445958a75a0704d566BF2C8);
+    CrossChainManager public crossChainManager;
 
     /**
      * @dev A struct to define the parameters for a single arbitrage trade.
@@ -27,18 +29,67 @@ contract OptimalArbitrage is IFlashLoanRecipient {
         address[] dexRouters;
         address[] tokens;
         uint24 swapFee;
+        bool isCrossChain;
+        uint256 chainId;
+    }
+
+    // @dev SwapExecuted event emitted when a swap is executed successfully.
+    event SwapExecuted(address inputToken, address outputToken, uint256 inputAmount, uint256 outputAmount);
+
+    // @dev CrossChainArbitrageInitiated event emitted when a cross-chain arbitrage trade is initiated.
+    event CrossChainArbitrageInitiated(uint256 chainId, address target, bytes data);
+
+    constructor(address _crossChainManager) {
+        crossChainManager = CrossChainManager(_crossChainManager); // Initialize CrossChainManager
     }
 
     /**
-     * @notice Emitted when a swap is successfully executed on a DEX.
-     * @param inputToken The address of the token being swapped.
-     * @param outputToken The address of the token received after the swap.
-     * @param inputAmount The amount of inputToken swapped.
-     * @param outputAmount The minimum amount of outputToken expected (slippage protection).
+     * @notice Initiates a cross-chain arbitrage trade.
+     * @param dexRouters Array of two DEX router addresses to use for the swaps.
+     * @param tokens Array of two token addresses defining the arbitrage path.
+     * @param swapFee The fee tier for the Uniswap V3 pool.
+     * @param loanAmount The amount of the first token to borrow via flash loan.
+     * @param chainId The chain ID of the destination chain.
      */
-    event SwapExecuted(address inputToken, address outputToken, uint256 inputAmount, uint256 outputAmount);
+    function startCrossChainArbitrage(
+        address[] memory dexRouters,
+        address[] memory tokens,
+        uint24 swapFee,
+        uint256 loanAmount,
+        uint256 chainId
+    ) internal {
+        // Bridge tokens to the destination chain.
+        crossChainManager.bridgeTokens(tokens[0], loanAmount, address(this));
 
-    constructor() {}
+        // Encode the trade parameters for the cross-chain message.
+        bytes memory tradeData = abi.encode(
+            ArbitrageTrade({
+                dexRouters: dexRouters,
+                tokens: tokens,
+                swapFee: swapFee,
+                isCrossChain: true,
+                chainId: chainId
+            })
+        );
+
+        // Send a cross-chain message to initiate arbitrage on the destination chain.
+        crossChainManager.sendCrossChainMessage(address(this), tradeData);
+        emit CrossChainArbitrageInitiated(chainId, address(this), tradeData);
+    }
+
+    /**
+     * @notice Executes a cross-chain arbitrage trade.
+     * @param tradeData Encoded trade parameters passed from the source chain.
+     */
+    function executeCrossChainArbitrage(bytes memory tradeData) external {
+        // Decode the trade parameters.
+        ArbitrageTrade memory trade = abi.decode(tradeData, (ArbitrageTrade));
+
+        // Perform the arbitrage trade on this chain.
+        performDirectArbitrage(
+            trade.dexRouters, trade.tokens, trade.swapFee, IERC20(trade.tokens[0]).balanceOf(address(this))
+        );
+    }
 
     /**
      * @notice Performs an arbitrage trade without using a flash loan.
