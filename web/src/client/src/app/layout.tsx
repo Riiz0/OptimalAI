@@ -7,7 +7,8 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'OptimalAI - DeFi Portfolio Manager',
-  description: 'AI-powered DeFi portfolio management through natural conversation',
+  description:
+    'AI-powered DeFi portfolio management through natural conversation',
 };
 
 export default function RootLayout({
@@ -17,9 +18,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning={true}>
         <Providers>{children}</Providers>
       </body>
     </html>
   );
-} 
+}
