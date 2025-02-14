@@ -87,7 +87,7 @@ contract HelperConfig is Script {
         returns (NetworkConfig memory)
     {
         NetworkConfig memory ArbitrumSepoliaConfig = NetworkConfig({
-            weth: 0x1dF462e2712496373A347f8ad10802a5E95f053D,
+            weth: 0x980B62Da83eFf3D4576C647993b0c1D7faf17c73,
             usdc: 0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d,
             aaveUsdc: 0x460b97BD498E1157530AEb3086301d5225b91216,
             compoundUsdc: 0xfb4561C6AFF45c00EE0D2eF33D058E2F96959f0F, // Mock compound usdc

@@ -34,7 +34,7 @@ contract SafeVaultDeployer is HelperConfig {
      *      Currently hardcoded to Base Sepolia, but can be extended for other networks.
      */
     constructor() {
-        currentNetworkConfig = getArbitrumSepoliaConfig();
+        currentNetworkConfig = getBaseSepoliaConfig();
     }
 
     /**

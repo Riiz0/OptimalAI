@@ -224,7 +224,7 @@ contract ProtocolHelper {
                 amount0Min: 0,
                 amount1Min: 0,
                 recipient: address(this),
-                deadline: block.timestamp
+                deadline: block.timestamp + 1
             });
 
         /// @dev Mint a new liquidity position and update user's position id
