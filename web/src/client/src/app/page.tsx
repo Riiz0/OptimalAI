@@ -1,4 +1,4 @@
-import { Chat } from '@/components/chat/chat-container';
+import { ChatContainer } from '@/components/chat/chat-container';
 import { Header } from '@/components/header';
 
 export default function Home() {
@@ -6,7 +6,7 @@ export default function Home() {
     <main className="flex min-h-screen flex-col">
       <Header />
       <div className="flex-1 container mx-auto px-4 py-8">
-        <Chat />
+        <ChatContainer />
       </div>
     </main>
   );

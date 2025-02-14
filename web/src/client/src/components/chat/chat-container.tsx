@@ -1,34 +1,55 @@
 'use client';
-import { SendIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import { useAccount } from 'wagmi';
+import { ChatBox } from './chat-box';
+import { ChatInfo } from './chat-info';
+import { ChatMessagesContainer } from './chat-messages-container';
+import { ChatStatusBar } from './chat-status-bar';
 
-export const Chat = () => {
+export const ChatContainer = () => {
   const [message, setMessage] = useState('');
+  const [isExpanded, setIsExpanded] = useState(false);
+  const { isConnected } = useAccount();
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)]">
-      <div className="flex-1 flex flex-col items-center justify-center text-center px-4">
-        <h1 className="text-text-secondary mb-2">Hi there</h1>
-        <h2 className="text-4xl font-semibold text-white mb-12">
-          How can i help you ?
-        </h2>
+    <div className="flex flex-col">
+      {/* Status Bar */}
+      <div
+        className={cn(
+          'transition-all duration-300 transform',
+          isExpanded
+            ? 'translate-y-0 opacity-100'
+            : '-translate-y-full opacity-0 pointer-events-none',
+        )}
+      >
+        <ChatStatusBar />
+      </div>
 
-        <div className="w-full max-w-2xl">
-          <div className="relative">
-            <input
-              type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Please connect your wallet to start using Optimal AI"
-              className="w-full bg-background-secondary text-white px-4 py-3 rounded-lg pr-12"
-              disabled={true} // Enable when wallet is connected
+      {/* Messages Container */}
+      <ChatMessagesContainer isExpanded={isExpanded} />
+
+      {/* Chat Input Area */}
+      <div className="relative">
+        {/* Background Info */}
+        <div className="absolute inset-0 flex items-center justify-center -z-10">
+          <ChatInfo isExpanded={isExpanded} />
+        </div>
+
+        {/* Chat Box with width transition wrapper */}
+        <div className="flex justify-center">
+          <div
+            className={cn(
+              'transition-all duration-300 ease-in-out',
+              isExpanded ? 'w-full' : 'w-[768px]',
+            )}
+          >
+            <ChatBox
+              message={message}
+              setMessage={setMessage}
+              disabled={!isConnected}
+              onFocus={() => setIsExpanded(true)}
             />
-            <button
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-primary rounded-lg disabled:opacity-50"
-              disabled={true} // Enable when wallet is connected
-            >
-              <SendIcon className="w-4 h-4 text-white" />
-            </button>
           </div>
         </div>
       </div>
