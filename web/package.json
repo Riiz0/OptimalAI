@@ -10,7 +10,13 @@
     "clean": "./scripts/clean.sh",
     "start:service:all": "pm2 start pnpm --name=\"all\" --restart-delay=3000 --max-restarts=10 -- run start:all",
     "stop:service:all": "pm2 stop all",
-    "postinstall": "npm rebuild better-sqlite3"
+    "postinstall": "npm rebuild better-sqlite3",
+    "format": "biome format --write .",
+    "lint": "biome lint --write .",
+    "lint:unsafe": "biome lint --write --unsafe .",
+    "ci:check": "biome ci --formatter-enabled=false --linter-enabled=false",
+    "ci:format": "biome ci --linter-enabled=false --organize-imports-enabled=false",
+    "ci:lint": "biome ci --formatter-enabled=false --organize-imports-enabled=false"
   },
   "dependencies": {
     "@elizaos/adapter-postgres": "0.1.9",
@@ -49,6 +55,7 @@
     }
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@types/better-sqlite3": "7.6.12",
     "pm2": "5.4.3",
     "ts-node": "10.9.2",
