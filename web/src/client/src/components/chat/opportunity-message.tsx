@@ -7,7 +7,7 @@ import { ChatSubMessageContainer } from './chat-sub-message-container';
 interface OpportunityMessageProps {
   type: 'lending' | 'liquidity';
   protocol: string;
-  token?: string;
+  token: string;
   apy: number;
   pairToken?: string; // Optional for liquidity pools
 }
@@ -30,7 +30,7 @@ export const OpportunityMessage = ({
         <div className="flex items-center justify-between pt-2 gap-56">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              {token && logoForTokenName(token)}
+              {logoForTokenName(token)}
               {pairToken && logoForTokenName(pairToken)}
             </div>
             <div className="flex flex-col">

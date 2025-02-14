@@ -44,6 +44,23 @@ export interface VaultContent {
   strategy: Strategy;
 }
 
+export type MessageAction =
+  | 'IGNORE'
+  | 'STRATEGY'
+  | 'TRANSACTION'
+  | 'VAULT'
+  | 'OPPORTUNITY';
+
+export interface BaseMessage {
+  user: 'agent' | 'user';
+  text: string;
+  action: MessageAction;
+  content: {
+    success: boolean;
+    [key: string]: any;
+  };
+}
+
 export type Message =
   | { type: 'user' | 'agent'; content: string }
   | { type: 'strategy'; content: { strategy: Strategy } }

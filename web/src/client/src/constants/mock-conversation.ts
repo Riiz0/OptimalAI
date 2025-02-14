@@ -13,6 +13,8 @@ export const MockConversation: Message[] = [
       protocol: 'aave',
       token: 'USDC',
       apy: 4.82,
+      description: 'Earn stable yields by lending USDC on Aave',
+      estimatedApy: '4.82% APY',
     },
   },
   {
@@ -126,9 +128,9 @@ export const MockConversation: Message[] = [
     type: 'transaction',
     content: {
       type: 'lending',
-      protocol: 'aave',
+      protocol: 'aave' as const,
       token: 'USDC',
-      amount: '3500',
+      amount: '3,500',
       apy: 4.82,
       txHash: '0xabcd...1234',
       chainId: 8453,
@@ -138,10 +140,10 @@ export const MockConversation: Message[] = [
     type: 'transaction',
     content: {
       type: 'liquidity',
-      protocol: 'aerodrome',
+      protocol: 'aerodrome' as const,
       token: 'USDC',
       pairToken: 'ETH',
-      amount: '1500',
+      amount: '1,500',
       apy: 12.5,
       txHash: '0xdef0...5678',
       chainId: 8453,
