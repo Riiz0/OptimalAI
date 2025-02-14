@@ -71,6 +71,46 @@ OptimalAI combines several cutting-edge technologies:
 - Emergency withdrawal mechanisms
 - Real-time risk monitoring
 
+## 🏆 Sponsor Tracks
+
+**OptimalAI** is designed to compete in the following **Safe Agentathon** tracks:
+
+### **DeFAI: Best-In-Class**
+
+- OptimalAI is a cutting-edge DeFi + AI solution that integrates advanced portfolio management, autonomous decision-making, and multi-protocol interactions.
+
+### **DeFAI: Best DeFAI Agent on Arbitrum**
+
+- Fully deployed and optimized for Arbitrum, OptimalAI leverages the network's low fees and high throughput for seamless DeFi operations.
+
+### **DeFAI: Best DeFAI Agent on Avalanche**
+
+- OptimalAI is deployed on Avalanche, leveraging its high-speed consensus and low transaction costs for efficient DeFi operations.
+
+### **Treasury Management: Best Overall**
+
+- OptimalAI provides a robust treasury management solution with features like yield optimization, risk management, and cross-protocol liquidity management.
+
+### **AI Advancement - Best Multi-Model Synergy Agent**
+
+- OptimalAI combines multiple AI models (e.g., yield optimization, arbitrage detection, and risk assessment) to create a synergistic decision-making framework.
+
+### **AI Advancement: Most Autonomous Agent**
+
+- With minimal human intervention, OptimalAI autonomously executes strategies like lending, borrowing, liquidity provision, and arbitrage.
+
+### **DeFAI: Autonomous Business Agents**
+
+- OptimalAI acts as an autonomous business agent, managing portfolios, executing trades, and optimizing yields without manual intervention.
+
+### **AI Advancement: Best-in-Class**
+
+- OptimalAI sets a new standard for AI-driven DeFi solutions with its modular architecture, multi-protocol integration, and autonomous capabilities.
+
+### **Treasury Management: Advanced Portfolio Management**
+
+- OptimalAI offers advanced portfolio management features, including dynamic rebalancing, risk-adjusted yield optimization, and cross-chain liquidity management.
+
 ## 🛣️ Roadmap
 
 ### Phase 1 - Q2 2024
