@@ -1,25 +1,29 @@
+import { ChatLoading } from '@/components/chat/chat-loading';
 import { cn } from '@/lib/utils';
-import { ChatMessage } from './chat-message';
+import type { PropsWithChildren } from 'react';
 
-interface ChatMessagesContainerProps {
+interface ChatMessagesContainerProps extends PropsWithChildren {
   isExpanded: boolean;
+  isLoading?: boolean;
 }
 
 export const ChatMessagesContainer = ({
   isExpanded,
+  isLoading,
+  children,
 }: ChatMessagesContainerProps) => {
   return (
     <div
       className={cn(
-        'overflow-y-auto transition-all duration-300',
-        isExpanded ? 'h-[calc(100vh-18rem)]' : 'h-[30vh]',
+        'overflow-y-auto',
+        'transition-all duration-300',
+        isExpanded
+          ? 'h-[calc(100vh-18rem)] pt-12' // Added padding-top for status bar
+          : 'h-[30vh] opacity-0',
       )}
     >
-      <ChatMessage
-        isAgent={true}
-        content="Before we can start implementing your strategy, you'll need to fund your vault. Please select a token to deposit:"
-      />
-      <ChatMessage content="I'd like to deposit USDC" />
+      {children}
+      {isLoading && <ChatLoading />}
     </div>
   );
 };
