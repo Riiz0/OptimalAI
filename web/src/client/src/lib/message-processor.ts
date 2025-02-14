@@ -1,7 +1,7 @@
 import { MockConversation } from '@/constants/mock-conversation';
 import type { BaseResponse } from '@/types/api';
 import type { Message, MessageAction } from '@/types/messages';
-import type { Strategy } from '../../../types/strategy';
+import type { Strategy } from '@/types/strategy';
 
 export const processApiResponse = (response: BaseResponse): Message[] => {
   const messages: Message[] = [];

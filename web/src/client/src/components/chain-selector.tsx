@@ -11,8 +11,7 @@ import {
 } from '@/components/ui/select';
 import { extractChain } from 'viem';
 import { useChainId, useSwitchChain } from 'wagmi';
-import { SUPPORTED_CHAINS } from '../../../constants/supported-chains';
-
+import { SUPPORTED_CHAINS } from '../constants/supported-chains';
 const CHAIN_LOGOS = {
   84532: BaseLogo,
   421614: ArbitrumLogo,
