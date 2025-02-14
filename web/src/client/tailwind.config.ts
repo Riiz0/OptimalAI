@@ -53,6 +53,15 @@ const config: Config = {
         border: {
           DEFAULT: '#21212E', // Dark gray
         },
+        green: {
+          500: '#4FF570',
+        },
+        yellow: {
+          500: '#FFD700',
+        },
+        red: {
+          500: '#FF0000',
+        },
       },
     },
   },
