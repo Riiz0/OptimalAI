@@ -1,6 +1,6 @@
 # OptimalAI: AI-Powered DeFi Portfolio Manager
 
-**OptimalAI** is a comprehensive DeFi portfolio management system that leverages artificial intelligence to optimize investments across multiple protocols. The system consists of a modular smart contract architecture that enables secure asset management, automated trading strategies, and cross-protocol interactions.
+**OptimalAI** is a comprehensive DeFi portfolio management system that leverages artificial intelligence to optimize investments across multiple protocols. The system consists of a modular smart contract architecture that enables secure asset management, automated trading strategies, and cross-protocol interactions. Built for the Safe Agentathon, OptimalAI aims to redefine DeFi portfolio management by combining AI-driven decision-making with robust on-chain execution.
 
 ---
 
