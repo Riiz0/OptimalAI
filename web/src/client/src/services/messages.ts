@@ -8,13 +8,16 @@ if (!API_URL) {
 
 export const messagesService = {
   async send(message: MessageRequest): Promise<BaseResponse> {
-    const response = await fetch(`${API_URL}/messages`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      `${API_URL}/416659f6-a8ab-4d90-87b5-fd5635ebe37d/message`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(message),
       },
-      body: JSON.stringify(message),
-    });
+    );
 
     if (!response.ok) {
       throw new Error('Failed to send message');

@@ -1,7 +1,10 @@
 'use client';
 import { cn } from '@/lib/utils';
+import { messagesService } from '@/services/messages';
 import { useState } from 'react';
+import useSWR from 'swr';
 import { useAccount } from 'wagmi';
+import { SUPPORTED_CHAINS } from '../../../../constants/supported-chains';
 import { ChatBox } from './chat-box';
 import { ChatInfo } from './chat-info';
 import { ChatMessagesContainer } from './chat-messages-container';
@@ -10,7 +13,29 @@ import { ChatStatusBar } from './chat-status-bar';
 export const ChatContainer = () => {
   const [message, setMessage] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
-  const { isConnected } = useAccount();
+  const { isConnected, isConnecting, address, chain } = useAccount();
+
+  const { isLoading: isInitializing } = useSWR(
+    isExpanded && address && chain ? 'init-chat' : null,
+    () =>
+      messagesService.send({
+        name: address ?? '',
+        text: `Initialize user state {walletAddress: "${address}", chain: "${
+          SUPPORTED_CHAINS.find((c) => c.id === chain?.id)?.elizaName ?? ''
+        }"}`,
+      }),
+    {
+      revalidateOnFocus: false,
+    },
+  );
+
+  const status = isConnecting
+    ? 'connecting'
+    : isConnected
+      ? isInitializing
+        ? 'initializing'
+        : 'connected'
+      : 'disconnected';
 
   return (
     <div className="flex flex-col">
@@ -23,7 +48,7 @@ export const ChatContainer = () => {
             : '-translate-y-full opacity-0 pointer-events-none',
         )}
       >
-        <ChatStatusBar />
+        <ChatStatusBar status={status} />
       </div>
 
       {/* Messages Container */}

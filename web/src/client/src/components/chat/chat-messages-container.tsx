@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { ChatMessage } from './chat-message';
 
 interface ChatMessagesContainerProps {
   isExpanded: boolean;
@@ -14,7 +15,11 @@ export const ChatMessagesContainer = ({
         isExpanded ? 'h-[calc(100vh-18rem)]' : 'h-[30vh]',
       )}
     >
-      {/* Messages will go here */}
+      <ChatMessage
+        isAgent={true}
+        content="Before we can start implementing your strategy, you'll need to fund your vault. Please select a token to deposit:"
+      />
+      <ChatMessage content="I'd like to deposit USDC" />
     </div>
   );
 };
