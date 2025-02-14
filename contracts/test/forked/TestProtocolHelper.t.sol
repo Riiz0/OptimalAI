@@ -131,6 +131,7 @@ contract ProtocolHelperTest is Test {
 
     function testAddLiquidityToUniswap() public {
         vm.startPrank(owner);
+
         vault.supplyTokenPairToLPProtocol(
             "uniswap",
             networkConfig.weth,
@@ -138,8 +139,8 @@ contract ProtocolHelperTest is Test {
             10 * 1e6,
             10 * 1e6,
             3000,
-            TickMath.MIN_TICK,
-            TickMath.MAX_TICK
+            -0,
+            0
         );
 
         vm.stopPrank();

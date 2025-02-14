@@ -211,14 +211,17 @@ contract ProtocolHelper {
         IERC20(_tokenA).approve(address(nonFungiblePositionManager), _amount0);
         IERC20(_tokenB).approve(address(nonFungiblePositionManager), _amount1);
 
+        (, int24 tick, , , , , ) = IUniswapV3Pool(pool).slot0();
+        int24 tickSpacing = IUniswapV3Pool(pool).tickSpacing();
+
         /// @dev Calculate the liquidity
         INonfungiblePositionManager.MintParams
             memory params = INonfungiblePositionManager.MintParams({
                 token0: _tokenA,
                 token1: _tokenB,
                 fee: _fee,
-                tickLower: _tickLower,
-                tickUpper: _tickUpper,
+                tickLower: tick - tickSpacing * 2,
+                tickUpper: tick + tickSpacing * 2,
                 amount0Desired: _amount0,
                 amount1Desired: _amount1,
                 amount0Min: 0,
