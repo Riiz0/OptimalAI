@@ -27,7 +27,7 @@ export const processApiResponse = (response: BaseResponse): Message[] => {
         }
         break;
       case 'TRANSACTION':
-        if (res.content.success) {
+        if (res.content.success && typeof res.content === 'object') {
           const { success, ...transactionContent } = res.content;
           messages.push({
             type: 'transaction',
@@ -36,7 +36,7 @@ export const processApiResponse = (response: BaseResponse): Message[] => {
         }
         break;
       case 'OPPORTUNITY':
-        if (res.content.success) {
+        if (res.content.success && typeof res.content === 'object') {
           const { success, ...opportunityContent } = res.content;
           messages.push({
             type: 'opportunity',
@@ -45,7 +45,7 @@ export const processApiResponse = (response: BaseResponse): Message[] => {
         }
         break;
       case 'VAULT':
-        if (res.content.success) {
+        if (res.content.success && typeof res.content === 'object') {
           const { success, ...vaultContent } = res.content;
           messages.push({
             type: 'vault',
@@ -62,6 +62,10 @@ export const processApiResponse = (response: BaseResponse): Message[] => {
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 let mockMessageIndex = 0;
+
+const isStringContent = (content: Message['content']): content is string => {
+  return typeof content === 'string';
+};
 
 const getMockResponse = async (): Promise<BaseResponse> => {
   const messages: BaseResponse = [];
@@ -87,12 +91,12 @@ const getMockResponse = async (): Promise<BaseResponse> => {
     const action = msg.type.toUpperCase() as MessageAction;
     messages.push({
       user: 'agent',
-      text: msg.type === 'agent' ? msg.content : '',
+      text: isStringContent(msg.content) ? msg.content : '',
       action,
-      content: {
-        success: true,
-        ...(msg.type === 'agent' ? {} : msg.content),
-      },
+      content:
+        msg.type === 'agent'
+          ? { success: true }
+          : { success: true, ...(msg.content as Record<string, unknown>) },
     });
 
     mockMessageIndex++;
@@ -116,7 +120,7 @@ export const messagesService = {
     if (isDemoMode) {
       return getMockResponse();
     }
-
+    return [];
     // ... real API call logic
   },
 

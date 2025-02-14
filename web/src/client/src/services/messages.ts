@@ -30,7 +30,7 @@ const getMockResponse = async (): Promise<BaseResponse> => {
       user: 'agent',
       text:
         MockConversation[mockMessageIndex].type === 'agent'
-          ? MockConversation[mockMessageIndex].content
+          ? (MockConversation[mockMessageIndex].content as string)
           : '',
       action:
         MockConversation[mockMessageIndex].type === 'agent'
@@ -38,7 +38,7 @@ const getMockResponse = async (): Promise<BaseResponse> => {
           : MockConversation[mockMessageIndex].type.toUpperCase(),
       content: {
         success: true,
-        ...MockConversation[mockMessageIndex].content,
+        ...(MockConversation[mockMessageIndex].content as object),
       },
     });
     mockMessageIndex++;
