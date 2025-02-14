@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { ChatLoading } from './chat-loading';
 import { ChatMessage } from './chat-message';
 
 interface ChatMessagesContainerProps {
@@ -20,6 +21,7 @@ export const ChatMessagesContainer = ({
         content="Before we can start implementing your strategy, you'll need to fund your vault. Please select a token to deposit:"
       />
       <ChatMessage content="I'd like to deposit USDC" />
+      <ChatLoading />
     </div>
   );
 };
