@@ -1,13 +1,14 @@
+import { ChatLoading } from '@/components/chat/chat-loading';
 import { cn } from '@/lib/utils';
-import { ChatLoading } from './chat-loading';
-import { ChatMessage } from './chat-message';
 
 interface ChatMessagesContainerProps {
   isExpanded: boolean;
+  isLoading?: boolean;
 }
 
 export const ChatMessagesContainer = ({
   isExpanded,
+  isLoading,
 }: ChatMessagesContainerProps) => {
   return (
     <div
@@ -16,12 +17,7 @@ export const ChatMessagesContainer = ({
         isExpanded ? 'h-[calc(100vh-18rem)]' : 'h-[30vh]',
       )}
     >
-      <ChatMessage
-        isAgent={true}
-        content="Before we can start implementing your strategy, you'll need to fund your vault. Please select a token to deposit:"
-      />
-      <ChatMessage content="I'd like to deposit USDC" />
-      <ChatLoading />
+      {isLoading && <ChatLoading />}
     </div>
   );
 };

@@ -13,7 +13,7 @@ export const ChatMessageTextContainer = ({
   return (
     <div
       className={cn(
-        'max-w-[70%] rounded-md bg-[#1A212D] p-2',
+        'max-w-[60%] rounded-md bg-[#1A212D] p-2',
         'text-xs font-medium text-text-primary',
         align === 'right' && 'text-right',
       )}

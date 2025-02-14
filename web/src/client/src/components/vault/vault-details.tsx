@@ -1,6 +1,6 @@
+import { logoForTokenName } from '@/lib/logo-for-token-name';
 import { cn } from '@/lib/utils';
 import { Copy } from 'lucide-react';
-import Image from 'next/image';
 import type { Strategy } from '../../../../types/strategy';
 import { BalancesLogo } from '../base/balances-logo';
 import { StrategyLogo } from '../base/strategy-logo';
@@ -17,13 +17,6 @@ interface VaultDetailsProps {
     symbol: string;
   }[];
   strategy: Strategy;
-}
-
-function logoForToken(token: string) {
-  if (token === 'USDC') {
-    return <Image src="/usdc.png" alt="USDC Logo" width={26} height={26} />;
-  }
-  return <Image src="/usdt.png" alt="USDT Logo" width={26} height={26} />;
 }
 
 export const VaultDetails = ({
@@ -90,7 +83,7 @@ export const VaultDetails = ({
             {balances.map(({ token, amount }) => (
               <div key={token} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  {logoForToken(token)}
+                  {logoForTokenName(token)}
                   <span className="text-text-secondary">{token}</span>
                 </div>
                 <span className="text-white">{amount} </span>
@@ -132,10 +125,10 @@ export const VaultDetails = ({
 
       {/* Actions - Always at bottom */}
       <div className="mt-auto grid grid-cols-2 gap-4 pt-4">
-        <PrimaryButton>Withdraw</PrimaryButton>
         <button className="rounded-lg bg-background-secondary px-4 py-3 font-medium text-white transition-colors hover:bg-background-secondary/90">
-          Fund
+          Withdraw
         </button>
+        <PrimaryButton>Fund</PrimaryButton>
       </div>
     </div>
   );
