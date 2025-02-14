@@ -12,31 +12,26 @@ const mockPortfolioData = [
 ];
 
 const mockVaultDetails = {
-  address: '0xfB10339fA9eF9Ec7FB99f3393CEa13b5736bd061',
+  address: '0x1234...5678',
   isActive: true,
-  createdAt: '1/2/2025',
-  lastUpdate: '2/2/2025',
-  strategy: {
-    riskLevel: 'conservative',
-    allocations: {
-      lending: 100,
-      liquidity: 0,
-    },
-    description:
-      'A conservative strategy focused solely on lending. This will prioritize stability and capital preservation.',
-  },
+  createdAt: '2024-03-01',
+  lastUpdate: '2024-03-01',
   balances: [
     {
       token: 'USDC',
       amount: '5000',
       symbol: 'USDC',
     },
-    {
-      token: 'USDT',
-      amount: '5000',
-      symbol: 'USDT',
-    },
   ],
+  strategy: {
+    riskLevel: 'moderate' as const,
+    allocations: {
+      lending: 70,
+      liquidity: 30,
+    },
+    description:
+      'A balanced strategy with 70% allocation to lending protocols for stable yields, and 30% to curated liquidity pools for enhanced returns.',
+  },
 };
 
 export const DashboardView = () => {

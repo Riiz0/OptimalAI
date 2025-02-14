@@ -91,7 +91,7 @@ export const MockConversation: Message[] = [
         },
       ],
       strategy: {
-        riskLevel: 'moderate',
+        riskLevel: 'moderate' as const,
         allocations: {
           lending: 70,
           liquidity: 30,

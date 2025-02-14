@@ -63,7 +63,7 @@ export const PortfolioGraph = ({ data }: PortfolioGraphProps) => {
                         {payload[0].payload.date}
                       </p>
                       <p className="text-base font-medium text-white">
-                        ${payload[0].value.toLocaleString()}
+                        ${payload[0]?.value?.toLocaleString()}
                       </p>
                     </div>
                   );

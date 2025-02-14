@@ -25,6 +25,7 @@ export interface TransactionContent {
   apy: number;
   txHash: string;
   chainId: number;
+  [key: string]: any;
 }
 
 export interface OpportunityContent {
@@ -33,6 +34,9 @@ export interface OpportunityContent {
   token: string;
   pairToken?: string;
   apy: number;
+  description?: string;
+  estimatedApy?: string;
+  [key: string]: any;
 }
 
 export interface VaultContent {
@@ -42,6 +46,7 @@ export interface VaultContent {
   lastUpdate: string;
   balances: Balance[];
   strategy: Strategy;
+  [key: string]: any;
 }
 
 export type MessageAction =

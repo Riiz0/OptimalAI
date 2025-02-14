@@ -1,5 +1,7 @@
+export type RiskLevel = 'conservative' | 'moderate' | 'aggressive';
+
 export interface Strategy {
-  riskLevel: 'conservative' | 'moderate' | 'aggressive';
+  riskLevel: RiskLevel;
   allocations: {
     lending: number;
     liquidity: number;

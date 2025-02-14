@@ -1,6 +1,13 @@
 import { MockConversation } from '@/constants/mock-conversation';
-import type { BaseResponse } from '@/types/api';
-import type { Message, MessageAction } from '@/types/messages';
+import { useDemoStore } from '@/stores/demo-store';
+import type { BaseResponse, MessageRequest } from '@/types/api';
+import type {
+  Message,
+  MessageAction,
+  OpportunityContent,
+  TransactionContent,
+  VaultContent,
+} from '@/types/messages';
 import type { Strategy } from '@/types/strategy';
 
 export const processApiResponse = (response: BaseResponse): Message[] => {
@@ -12,7 +19,7 @@ export const processApiResponse = (response: BaseResponse): Message[] => {
         messages.push({ type: 'agent', content: res.text });
         break;
       case 'STRATEGY':
-        if (res.content.success) {
+        if (res.content.success && res.content.strategy) {
           messages.push({
             type: 'strategy',
             content: { strategy: res.content.strategy as Strategy },
@@ -21,25 +28,28 @@ export const processApiResponse = (response: BaseResponse): Message[] => {
         break;
       case 'TRANSACTION':
         if (res.content.success) {
+          const { success, ...transactionContent } = res.content;
           messages.push({
             type: 'transaction',
-            content: res.content,
+            content: transactionContent as TransactionContent,
           });
         }
         break;
       case 'OPPORTUNITY':
         if (res.content.success) {
+          const { success, ...opportunityContent } = res.content;
           messages.push({
             type: 'opportunity',
-            content: res.content,
+            content: opportunityContent as OpportunityContent,
           });
         }
         break;
       case 'VAULT':
         if (res.content.success) {
+          const { success, ...vaultContent } = res.content;
           messages.push({
             type: 'vault',
-            content: res.content,
+            content: vaultContent as VaultContent,
           });
         }
         break;
@@ -100,7 +110,7 @@ const getMockResponse = async (): Promise<BaseResponse> => {
 };
 
 export const messagesService = {
-  async send(message: MessageRequest): Promise<BaseResponse> {
+  async send(_message: MessageRequest): Promise<BaseResponse> {
     const { isDemoMode } = useDemoStore.getState();
 
     if (isDemoMode) {
